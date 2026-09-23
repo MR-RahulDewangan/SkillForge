@@ -23,15 +23,31 @@ const JobSearchPage = () => {
   const fetchOpportunities = async () => {
     setLoading(true);
     try {
-      const params = {
-        location: filters.location,
-        mode: filters.workMode,
-        type: filters.type
-      };
-      const res = await axios.get('/api/opportunities/search', {
-        params,
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const hasFilters = filters.location || filters.workMode || filters.type;
+      let res;
+      if (!hasFilters && user?.role === 'STUDENT') {
+        try {
+          res = await axios.get('/api/matching/recommendations/opportunities', {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+        } catch {
+          // fallback to search if recommendations fails
+          res = null;
+        }
+      }
+
+      if (!res) {
+        const params = {
+          location: filters.location,
+          mode: filters.workMode,
+          type: filters.type
+        };
+        res = await axios.get('/api/opportunities/search', {
+          params,
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+      }
+
       setOpportunities(res.data);
     } catch (err) {
       console.error('Failed to fetch opportunities', err);
@@ -118,9 +134,20 @@ const JobSearchPage = () => {
                       <p className="text-sm text-slate-500">{opp.company.name} {opp.company.isVerified && <CheckCircle2 size={14} className="inline text-indigo-600" />}</p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-600">
-                    {opp.type}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {opp.match && (
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        opp.match.overallMatch >= 70 ? 'bg-green-100 text-green-700 border border-green-200' :
+                        opp.match.overallMatch >= 40 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                        'bg-red-100 text-red-700 border border-red-200'
+                      }`}>
+                        {opp.match.overallMatch}% Match
+                      </span>
+                    )}
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-600">
+                      {opp.type}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
                   <span className="flex items-center gap-1"><MapPin size={14} /> {opp.location}</span>
@@ -180,6 +207,68 @@ const JobSearchPage = () => {
                       ))}
                     </div>
                   </div>
+                  {selectedOpp.match && (
+                    <div className="p-4 bg-slate-50 rounded-xl border space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-slate-800">Deterministic Match</span>
+                        <span className={`text-lg font-black ${
+                          selectedOpp.match.overallMatch >= 70 ? 'text-green-600' :
+                          selectedOpp.match.overallMatch >= 40 ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {selectedOpp.match.overallMatch}%
+                        </span>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between text-slate-500">
+                          <span>Skill Match (70%):</span>
+                          <span className="font-bold text-slate-700">{selectedOpp.match.skillMatch}%</span>
+                        </div>
+                        <div className="flex justify-between text-slate-500">
+                          <span>Eligibility (20%):</span>
+                          <span className="font-bold text-slate-700">{selectedOpp.match.eligibilityScore}%</span>
+                        </div>
+                        <div className="flex justify-between text-slate-500">
+                          <span>Career Interest (10%):</span>
+                          <span className="font-bold text-slate-700">{selectedOpp.match.interestScore}%</span>
+                        </div>
+                      </div>
+
+                      {selectedOpp.match.matchingSkills?.length > 0 && (
+                        <div className="pt-2 border-t">
+                          <span className="text-[11px] font-semibold text-green-700 block mb-1">Matching Skills:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedOpp.match.matchingSkills.map((sk, idx) => (
+                              <span key={idx} className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded font-medium">✓ {sk}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedOpp.match.missingSkills?.length > 0 && (
+                        <div className="pt-1">
+                          <span className="text-[11px] font-semibold text-red-600 block mb-1">Missing / Gap Skills:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedOpp.match.missingSkills.map((sk, idx) => (
+                              <span key={idx} className="bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded font-medium">! {sk}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedOpp.match.eligibilityIssues?.length > 0 && (
+                        <div className="pt-1">
+                          <span className="text-[11px] font-semibold text-amber-700 block mb-1">Eligibility Issues:</span>
+                          <ul className="text-[10px] text-amber-600 list-disc pl-4 space-y-0.5">
+                            {selectedOpp.match.eligibilityIssues.map((issue, idx) => (
+                              <li key={idx}>{issue}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <button
                     onClick={() => handleApply(selectedOpp.id)}
                     className="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2"

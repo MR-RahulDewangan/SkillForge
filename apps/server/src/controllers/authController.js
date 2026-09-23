@@ -27,6 +27,20 @@ const register = async (req, res) => {
       },
     });
 
+    if (role === 'STUDENT') {
+      await prisma.student.create({
+        data: { userId: user.id }
+      });
+    } else if (role === 'INDUSTRY') {
+      await prisma.company.create({
+        data: {
+          userId: user.id,
+          name: `${firstName} ${lastName} Org`,
+          industry: 'Technology'
+        }
+      });
+    }
+
     res.status(201).json({ 
       message: 'User registered successfully',
       userId: user.id,

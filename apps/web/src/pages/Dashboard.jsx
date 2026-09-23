@@ -1,11 +1,13 @@
 import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { LayoutDashboard, LogOut, User, Briefcase, GraduationCap, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, LogOut, User, Briefcase, GraduationCap, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   const roleConfigs = {
     STUDENT: {
@@ -13,32 +15,50 @@ const Dashboard = () => {
       icon: <GraduationCap className="text-blue-600" />,
       color: 'bg-blue-50',
       welcome: 'Ready to boost your skills?',
-      features: ['Skill Assessment', 'Career Path', 'Job Search', 'Portfolio']
+      features: [
+        { name: 'Skill Assessment', path: '/assess', desc: 'Test and certify your technical skills' },
+        { name: 'Skill Gap Analysis', path: '/gap-analysis', desc: 'Analyze gaps against career target' },
+        { name: 'Job & Internship Search', path: '/opportunities', desc: 'Browse matched internships and jobs' },
+        { name: 'Skill Profile & Portfolio', path: '/profile', desc: 'Manage skills and digital portfolio' },
+        { name: 'My Applications', path: '/my-applications', desc: 'Track your application statuses' },
+        { name: 'AI Career Assistant', path: '/ai-assistant', desc: 'Get personalized career guidance' },
+        { name: 'AI Resume Import', path: '/resume-parser', desc: 'Autofill profile from resume PDF' }
+      ]
     },
     INDUSTRY: {
       title: 'Recruiter Portal',
       icon: <Briefcase className="text-indigo-600" />,
       color: 'bg-indigo-50',
       welcome: 'Looking for top talent?',
-      features: ['Post Opportunities', 'Manage Applicants', 'Skill Analytics', 'Company Profile']
+      features: [
+        { name: 'Company Dashboard', path: '/company/dashboard', desc: 'Manage organization and post opportunities' },
+        { name: 'Applicant Tracking (ATS)', path: '/ats', desc: 'Review candidates and match scores' },
+        { name: 'Institution Analytics', path: '/analytics', desc: 'View skill demand and pipeline data' }
+      ]
     },
     FACULTY: {
       title: 'Academician Portal',
       icon: <User className="text-green-600" />,
       color: 'bg-green-50',
       welcome: 'Collaborate with industry experts',
-      features: ['Research Collabs', 'Faculty Internships', 'Mentorship', 'FDP Search']
+      features: [
+        { name: 'Institution Analytics', path: '/analytics', desc: 'Skill gaps and industry demands' },
+        { name: 'Browse Opportunities', path: '/opportunities', desc: 'View student internships and jobs' }
+      ]
     },
     INSTITUTION_ADMIN: {
       title: 'Admin Control Panel',
       icon: <ShieldCheck className="text-purple-600" />,
       color: 'bg-purple-50',
       welcome: 'Monitor institutional growth',
-      features: ['Student Analytics', 'Placement Tracking', 'Company Verification', 'Faculty Management']
+      features: [
+        { name: 'Institution Analytics', path: '/analytics', desc: 'KPIs, skill gaps, demand, placement funnel' },
+        { name: 'Browse Opportunities', path: '/opportunities', desc: 'Active company postings' }
+      ]
     },
   };
 
-  const config = roleConfigs[user.role];
+  const config = roleConfigs[user.role] || roleConfigs.STUDENT;
 
   return (
     <div className="min-h-screen flex">
@@ -50,9 +70,26 @@ const Dashboard = () => {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <div className="text-xs uppercase text-slate-500 font-semibold px-2 mb-4">Main Menu</div>
-          <a href="#" className="flex items-center gap-3 p-2 rounded bg-slate-800 text-white">Dashboard</a>
-          <a href="#" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Profile</a>
-          <a href="#" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Settings</a>
+          <Link to="/dashboard" className="flex items-center gap-3 p-2 rounded bg-slate-800 text-white">Dashboard</Link>
+          <Link to="/profile" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Profile</Link>
+          {user.role === 'STUDENT' && (
+            <>
+              <Link to="/assess" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Assessment</Link>
+              <Link to="/gap-analysis" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Skill Gap</Link>
+              <Link to="/opportunities" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Opportunities</Link>
+              <Link to="/my-applications" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Applications</Link>
+              <Link to="/ai-assistant" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">AI Assistant</Link>
+            </>
+          )}
+          {user.role === 'INDUSTRY' && (
+            <>
+              <Link to="/company/dashboard" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Company</Link>
+              <Link to="/ats" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">ATS Applicants</Link>
+            </>
+          )}
+          {(user.role === 'INSTITUTION_ADMIN' || user.role === 'FACULTY') && (
+            <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
+          )}
         </nav>
         <div className="p-4 border-t border-slate-800">
           <button 
@@ -92,14 +129,24 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {config.features.map((feature) => (
-              <div key={feature} className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition cursor-pointer group">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-100 transition">
-                  <div className="w-5 h-5 bg-slate-400 rounded-sm group-hover:bg-indigo-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {config.features.map((feature, idx) => (
+              <div 
+                key={idx} 
+                onClick={() => navigate(feature.path)}
+                className="bg-white p-6 rounded-2xl border shadow-sm hover:border-indigo-300 hover:shadow-md transition cursor-pointer group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition">
+                    <ArrowRight size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-800 mb-1">{feature.name}</h3>
+                  <p className="text-xs text-slate-500">{feature.desc}</p>
                 </div>
-                <h3 className="font-semibold text-slate-800 mb-1">{feature}</h3>
-                <p className="text-sm text-slate-500">Coming soon in next phase...</p>
+                <div className="mt-4 pt-4 border-t flex items-center justify-between text-xs font-semibold text-indigo-600">
+                  <span>Open Module</span>
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
             ))}
           </div>

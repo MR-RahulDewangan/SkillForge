@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/authApi';
 
-const API_BASE = '/api/portfolio';
+const API_BASE = '/portfolio';
 
 const PortfolioManager = ({ studentId }) => {
   const [projects, setProjects] = useState([]);
@@ -10,12 +10,14 @@ const PortfolioManager = ({ studentId }) => {
   const [certForm, setCertForm] = useState({ name: '', issuer: '', issueDate: '', url: '' });
 
   useEffect(() => {
-    fetchPortfolio();
+    if (studentId) {
+      fetchPortfolio();
+    }
   }, [studentId]);
 
   const fetchPortfolio = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/${studentId}`);
+      const res = await api.get(`${API_BASE}/${studentId}`);
       setProjects(res.data.projects || []);
       setCertificates(res.data.certificates || []);
     } catch (err) {
@@ -26,7 +28,7 @@ const PortfolioManager = ({ studentId }) => {
   const handleAddProject = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE}/projects`, { ...projectForm, studentId });
+      await api.post(`${API_BASE}/projects`, { ...projectForm, studentId });
       setProjectForm({ name: '', description: '', url: '' });
       fetchPortfolio();
     } catch (err) {
@@ -36,7 +38,7 @@ const PortfolioManager = ({ studentId }) => {
 
   const handleDeleteProject = async (id) => {
     try {
-      await axios.delete(`${API_BASE}/projects/${id}`);
+      await api.delete(`${API_BASE}/projects/${id}`);
       fetchPortfolio();
     } catch (err) {
       console.error('Error deleting project', err);
@@ -46,7 +48,7 @@ const PortfolioManager = ({ studentId }) => {
   const handleAddCertificate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_BASE}/certificates`, { ...certForm, studentId });
+      await api.post(`${API_BASE}/certificates`, { ...certForm, studentId });
       setCertForm({ name: '', issuer: '', issueDate: '', url: '' });
       fetchPortfolio();
     } catch (err) {
@@ -56,7 +58,7 @@ const PortfolioManager = ({ studentId }) => {
 
   const handleDeleteCertificate = async (id) => {
     try {
-      await axios.delete(`${API_BASE}/certificates/${id}`);
+      await api.delete(`${API_BASE}/certificates/${id}`);
       fetchPortfolio();
     } catch (err) {
       console.error('Error deleting certificate', err);

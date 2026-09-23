@@ -1,7 +1,10 @@
 const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const { getSkillsByRole, getAllRoles } = require('../controllers/skillController');
 const { authenticate } = require('../middleware/authMiddleware');
 const router = express.Router();
+
 
 router.get('/roles', authenticate, getAllRoles);
 router.get('/roles/all', authenticate, async (req, res) => {

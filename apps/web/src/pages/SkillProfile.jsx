@@ -16,9 +16,7 @@ const SkillProfile = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch('/api/user/me');
-        const { user: authUser } = await res.json();
-        const pData = await getStudentProfile(authUser.id);
+        const pData = await getStudentProfile(user?.id || 'me');
         setProfile(pData);
         const rolesData = await getAllRoles();
         setRoles(rolesData);
@@ -29,7 +27,7 @@ const SkillProfile = () => {
       }
     };
     loadData();
-  }, []);
+  }, [user]);
 
   const handleGoalChange = async (roleId) => {
     try {

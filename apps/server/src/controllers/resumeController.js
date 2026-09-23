@@ -27,7 +27,7 @@ const autoFillProfile = async (req, res) => {
         await prisma.project.create({
           data: {
             studentId: student.id,
-            title: title,
+            name: title,
             description: projDesc,
             url: '' // Placeholder
           }

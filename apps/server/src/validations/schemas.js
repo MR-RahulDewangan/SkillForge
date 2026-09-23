@@ -21,12 +21,12 @@ const schemas = {
       description: z.string().min(10, 'Description must be at least 10 characters'),
       location: z.string().min(1, 'Location is required'),
       workMode: z.enum(['REMOTE', 'ONSITE', 'HYBRID']),
-      stipend: z.preprocess((val) => (val === '' ? null : parseFloat(val)), z.number().positive().nullable()),
-      salary: z.preprocess((val) => (val === '' ? null : parseFloat(val)), z.number().positive().nullable()),
-      minCgpa: z.preprocess((val) => (val === '' ? null : parseFloat(val)), z.number().min(0).max(10).nullable()),
-      requiredDegree: z.string().optional(),
-      requiredBranch: z.string().optional(),
-      graduationYear: z.preprocess((val) => (val === '' ? null : parseInt(val)), z.number().int().min(2000).max(2100).nullable()),
+      stipend: z.preprocess((val) => (val === '' || val === undefined ? null : parseFloat(val)), z.number().nullable().optional()),
+      salary: z.preprocess((val) => (val === '' || val === undefined ? null : parseFloat(val)), z.number().nullable().optional()),
+      minCgpa: z.preprocess((val) => (val === '' || val === undefined ? null : parseFloat(val)), z.number().min(0).max(10).nullable().optional()),
+      requiredDegree: z.string().nullable().optional(),
+      requiredBranch: z.string().nullable().optional(),
+      graduationYear: z.preprocess((val) => (val === '' || val === undefined ? null : parseInt(val)), z.number().int().min(2000).max(2100).nullable().optional()),
       deadline: z.string().refine((date) => !isNaN(Date.parse(date)), { message: 'Invalid date format' }),
       skills: z.array(z.object({
         id: z.string().uuid(),
@@ -36,7 +36,7 @@ const schemas = {
   },
   portfolio: {
     project: z.object({
-      title: z.string().min(1, 'Title is required'),
+      name: z.string().min(1, 'Name is required'),
       description: z.string().min(1, 'Description is required'),
       url: z.string().url('Invalid URL').optional().or(z.literal('')),
     }),

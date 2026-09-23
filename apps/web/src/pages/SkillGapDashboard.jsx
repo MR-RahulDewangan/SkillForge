@@ -6,13 +6,35 @@ import { AlertCircle, CheckCircle2, BookOpen, ArrowRight } from 'lucide-react';
 const SkillGapDashboard = () => {
   const { user } = useAuth();
   const [gaps, setGaps] = useState([]);
+  const [readiness, setReadiness] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadGaps = async () => {
       try {
         const data = await getSkillGaps();
-        setGaps(data);
+        if (data && data.gapAnalysis) {
+          setReadiness(data.readiness || 0);
+          const recs = data.recommendations || [];
+          const normalizedGaps = data.gapAnalysis.map(item => {
+            const rec = recs.find(r => r.skillName === item.skillName);
+            const severityLabel = item.severity 
+              ? item.severity.charAt(0) + item.severity.slice(1).toLowerCase() 
+              : (item.status === 'SATISFIED' ? 'Satisfied' : 'Gap');
+
+            return {
+              skillName: item.skillName,
+              currentScore: item.studentScore,
+              requiredScore: item.requiredScore,
+              status: severityLabel,
+              recommendedCourse: rec?.course?.title || 'Core Training Course',
+              courseUrl: rec?.course?.url || '#'
+            };
+          });
+          setGaps(normalizedGaps);
+        } else if (Array.isArray(data)) {
+          setGaps(data);
+        }
       } catch (err) {
         console.error('Failed to load skill gaps', err);
       } finally {
@@ -30,6 +52,14 @@ const SkillGapDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Skill Gap Analysis</h1>
           <p className="text-slate-500">Identify areas for improvement based on your career goal</p>
+        </div>
+
+        <div className="flex justify-between items-center bg-indigo-600 text-white p-6 rounded-2xl shadow-sm">
+          <div>
+            <h2 className="text-xl font-bold">Role Readiness Score</h2>
+            <p className="text-indigo-100 text-sm">Calculated deterministically against industry requirements</p>
+          </div>
+          <div className="text-4xl font-black">{readiness}%</div>
         </div>
 
         {gaps.length === 0 ? (

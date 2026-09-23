@@ -41,7 +41,7 @@ const submitAssessment = async (req, res) => {
       }
     });
 
-    const score = Math.round((correctCount / questions.length) * 100);
+    const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
 
     // 2. Record attempt
     await prisma.assessmentAttempt.create({

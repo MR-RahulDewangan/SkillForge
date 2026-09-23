@@ -118,7 +118,10 @@ const calculateMatch = async (studentId, opportunityId) => {
 
 const getRecommendedOpportunities = async (studentId) => {
   const allOpportunities = await prisma.opportunity.findMany({
-    include: { company: true }
+    include: { 
+      company: true,
+      skills: { include: { skill: true } }
+    }
   });
 
   const recommendations = await Promise.all(
@@ -132,7 +135,9 @@ const getRecommendedOpportunities = async (studentId) => {
 };
 
 const getRecommendedCandidates = async (opportunityId) => {
-  const students = await prisma.student.findMany();
+  const students = await prisma.student.findMany({
+    include: { user: true }
+  });
   
   const candidates = await Promise.all(
     students.map(async (student) => {
