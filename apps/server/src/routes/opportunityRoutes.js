@@ -6,6 +6,7 @@ const schemas = require('../validations/schemas');
 const router = express.Router();
 
 router.post('/', authenticate, authorize('INDUSTRY'), validate(schemas.opportunity.create), createOpportunity);
+router.get('/', authenticate, searchOpportunities);
 router.get('/search', authenticate, searchOpportunities);
 router.get('/:id', authenticate, getOpportunityDetails);
 

@@ -19,14 +19,27 @@ const getStudentProfile = async (req, res) => {
         },
         assessments: {
           orderBy: { startedAt: 'desc' },
-          take: 10,
-          include: { skill: { select: { name: true } } }
+          take: 10
         }
       }
     });
 
     if (!student) {
       return res.status(404).json({ message: 'Student profile not found' });
+    }
+
+    // Map skill names for assessments
+    const skillIds = student.assessments.map(a => a.skillId);
+    if (skillIds.length > 0) {
+      const skills = await prisma.skill.findMany({
+        where: { id: { in: skillIds } },
+        select: { id: true, name: true }
+      });
+      const skillMap = new Map(skills.map(s => [s.id, s.name]));
+      student.assessments = student.assessments.map(a => ({
+        ...a,
+        skill: { name: skillMap.get(a.skillId) || 'Skill' }
+      }));
     }
     
     res.json(student);

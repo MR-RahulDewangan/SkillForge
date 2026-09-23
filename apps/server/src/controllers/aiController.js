@@ -76,7 +76,7 @@ const analyzeMatch = async (req, res) => {
 
 const askAssistant = async (req, res) => {
   try {
-    const { query } = req.body;
+    const query = req.body.query || req.body.message || '';
     const userId = req.user.id;
 
     const student = await prisma.student.findFirst({
@@ -84,24 +84,35 @@ const askAssistant = async (req, res) => {
       include: {
         careerGoal: true,
         skills: { include: { skill: true } },
-        assessments: { include: { skill: { select: { name: true } } } }
+        assessments: {
+          orderBy: { startedAt: 'desc' },
+          take: 5
+        }
       }
     });
 
     if (!student) return res.status(404).json({ message: 'Student profile not found' });
 
+    const skillMap = new Map(student.skills.map(s => [s.skillId, s.skill.name]));
     const context = JSON.stringify({
       goal: student.careerGoal?.title,
       skills: student.skills.map(s => ({ name: s.skill.name, score: s.score })),
-      recentAssessments: student.assessments.map(a => ({ skill: a.skill.name, score: a.score }))
+      recentAssessments: student.assessments.map(a => ({ skill: skillMap.get(a.skillId) || 'Technical Skill', score: a.score }))
     });
 
-    const formData = new URLSearchParams();
-    formData.append('query', query);
-    formData.append('context', context);
+    try {
+      const formData = new URLSearchParams();
+      formData.append('query', query);
+      formData.append('context', context);
 
-    const response = await axios.post(`${AI_SERVICE_URL}/career-assistant`, formData);
-    res.json(response.data);
+      const response = await axios.post(`${AI_SERVICE_URL}/career-assistant`, formData, { timeout: 3000 });
+      return res.json(response.data);
+    } catch (aiErr) {
+      const targetRole = student.careerGoal?.title || 'Data Analyst';
+      const topSkills = student.skills.slice(0, 3).map(s => s.skill.name).join(', ');
+      const reply = `Based on your profile aiming for ${targetRole}, focus on sharpening your top skills (${topSkills || 'core fundamentals'}). Take our skill assessments, bridge any score deficits in your Gap Analysis, and ensure your capstone projects are verified for recruiter matching!`;
+      return res.json({ reply, source: 'fallback-assistant' });
+    }
   } catch (error) {
     res.status(500).json({ message: 'AI Assistant Error', error: error.message });
   }

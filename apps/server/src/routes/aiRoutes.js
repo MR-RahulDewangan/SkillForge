@@ -8,5 +8,6 @@ router.post('/parse-resume', authenticate, parseResume);
 router.post('/parse-jd', authenticate, authorize('INDUSTRY'), parseJD);
 router.post('/analyze-match', authenticate, analyzeMatch);
 router.post('/assistant', authenticate, authorize('STUDENT'), askAssistant);
+router.post('/guidance', authenticate, authorize('STUDENT'), askAssistant);
 
 module.exports = router;
