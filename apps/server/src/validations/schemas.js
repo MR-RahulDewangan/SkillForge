@@ -7,7 +7,7 @@ const schemas = {
       password: z.string().min(6, 'Password must be at least 6 characters'),
       firstName: z.string().min(1, 'First name is required'),
       lastName: z.string().min(1, 'Last name is required'),
-      role: z.enum(['STUDENT', 'INDUSTRY', 'FACULTY', 'INSTITUTION_ADMIN']),
+      role: z.enum(['STUDENT', 'INDUSTRY', 'FACULTY']),
     }),
     login: z.object({
       email: z.string().email('Invalid email address'),

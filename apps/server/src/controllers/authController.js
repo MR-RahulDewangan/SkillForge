@@ -11,6 +11,15 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
+    if (role === 'INSTITUTION_ADMIN') {
+      return res.status(403).json({ message: 'Administrative roles cannot be registered through public registration' });
+    }
+
+    const allowedRoles = ['STUDENT', 'INDUSTRY', 'FACULTY'];
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({ message: 'Invalid role specified' });
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });

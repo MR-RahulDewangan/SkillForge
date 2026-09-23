@@ -84,15 +84,22 @@ const getStudentGaps = async (req, res) => {
     // Calculate average gap per skill across all students for their chosen goals
     const students = await prisma.student.findMany({
       include: {
-        careerGoal: { include: { skills: true } },
+        careerGoal: { 
+          include: { 
+            skills: { 
+              include: { skill: true } 
+            } 
+          } 
+        },
         skills: true
       }
     });
 
     const gapMap = {};
     students.forEach(student => {
-      if (!student.careerGoal) return;
+      if (!student.careerGoal || !student.careerGoal.skills) return;
       student.careerGoal.skills.forEach(rs => {
+        if (!rs.skill) return;
         const sSkill = student.skills.find(ss => ss.skillId === rs.skillId);
         const score = sSkill ? sSkill.score : 0;
         const gap = Math.max(0, rs.minRequiredScore - score);
@@ -111,7 +118,8 @@ const getStudentGaps = async (req, res) => {
 
     res.json(avgGaps);
   } catch (error) {
-    res.status(500).json({ message: 'Analytics error' });
+    console.error('getStudentGaps error:', error);
+    res.status(500).json({ message: 'Analytics error', error: error.message });
   }
 };
 

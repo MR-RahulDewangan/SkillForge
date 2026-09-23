@@ -16,6 +16,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const resumeRoutes = require('./routes/resumeRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/verify', verificationRoutes);
 app.use('/api/resume', resumeRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use(errorHandler);
 

@@ -1,0 +1,564 @@
+{
+  "total": 75,
+  "passed": 75,
+  "failed": 0,
+  "categories": {
+    "Authentication": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Valid Login (STUDENT)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Valid Login (STUDENT_2)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Valid Login (INDUSTRY)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Valid Login (FACULTY)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Valid Login (INSTITUTION_ADMIN)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Invalid Password Rejection (401)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Non-existent User Rejection (401)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Missing Login Input (400)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Valid Student Registration (201)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Duplicate Email Registration (400)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Security - Privilege Escalation": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Reject Public Admin Registration (400/403)",
+          "passed": true,
+          "detail": "Blocked with status 400"
+        }
+      ]
+    },
+    "Security - JWT": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Missing Auth Header (401)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Malformed JWT Token (401)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Tampered Signature Token (401)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Authorization": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Student accessing Admin Analytics (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Industry submitting Student Assessment (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Student Attempt Verification Self-Approve (403)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Profile Management": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Get Student Profile (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Get Resume Data (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Update Career Goal Valid (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Update Career Goal Non-existent Role (404)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Update Career Goal Missing Input (400)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Skill Assessment": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Fetch Skills List (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Fetch Assessment Questions (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Submit Assessment Valid (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Submit Assessment Missing Input (400)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Submit Assessment Non-existent Skill (404)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Security - Sensitive Data Leakage": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "No Correct Option Leak in Assessment (Safe)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Skill Gap Calculation": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Deterministic Gap Analysis (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Industry Calling Student Gap Route (403)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Learning Recommendations": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Fetch Course Recommendations (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Opportunity Creation": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Industry Post Opportunity (201)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Student Post Opportunity (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Missing Fields Validation (400)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Opportunity Search": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Search by Keyword (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Get Opportunity Details (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Get Non-existent Opportunity (404)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Opportunity Filtering": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Filter by Type and WorkMode (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Matching Engine": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Deterministic Formula Verification (70/20/10)",
+          "passed": true,
+          "detail": "Calculated 92 vs expected 92"
+        },
+        {
+          "name": "Explainable Breakdown Present",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Student Recommended Opportunities (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Recruiter Candidate Recommendations (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Security - IDOR": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Prevent Student from Viewing Other Match (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Student Cannot Modify Application Status (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Prevent Cross-Student Project Edit (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Prevent Cross-Student Certificate Deletion (403)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Cross-User Notification Mark Read (403)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Applications": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Student Apply to Opportunity (201)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Duplicate Application Prevention (409)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Apply to Non-existent Opportunity (404)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Industry View Received Applications (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Student View Own Applications (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Application Status": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Recruiter Shortlist Applicant (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Invalid Status Enum Rejection (400)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Portfolio": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Add Portfolio Project (201)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Add Project Missing Fields (400)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Add Portfolio Certificate (201)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Owner Update Project (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "View Portfolio by ID (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Resume Upload": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Upload Valid PDF Resume (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Security - File Upload": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Block Dangerous File Type (.exe) (400)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Certificate Upload": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Upload Valid Certificate Document (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "AI Resume Parsing": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Parse Resume Endpoint (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "AI Job Parsing": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Parse JD Requirements (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "AI Recommendations": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Semantic Match Analysis (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "AI Career Assistant Live Guidance (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Notifications": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Fetch Student Notifications (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Mark Notification Read (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Verification": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Faculty View All Students / Queue (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Faculty Verify Project (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    },
+    "Analytics": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Institution Metrics Overview (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Industry Demand Analytics (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Institutional Student Skill Gaps (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Institutional Placement Funnel (200)",
+          "passed": true,
+          "detail": ""
+        },
+        {
+          "name": "Recruiter Funnel & Match Analytics (200)",
+          "passed": true,
+          "detail": ""
+        }
+      ]
+    }
+  }
+}

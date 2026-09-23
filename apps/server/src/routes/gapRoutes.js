@@ -1,9 +1,9 @@
 const express = require('express');
 const { analyzeSkillGap } = require('../controllers/gapController');
-const { authenticate } = require('../middleware/authMiddleware');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.get('/analyze', authenticate, analyzeSkillGap);
-router.get('/analysis', authenticate, analyzeSkillGap);
+router.get('/analyze', authenticate, authorize('STUDENT'), analyzeSkillGap);
+router.get('/analysis', authenticate, authorize('STUDENT'), analyzeSkillGap);
 
 module.exports = router;

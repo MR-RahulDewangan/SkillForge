@@ -16,7 +16,14 @@ const getQuestions = async (req, res) => {
 
 const submitAssessment = async (req, res) => {
   try {
-    const { skillId, answers } = req.body; // answers: [{questionId, answerIndex}]
+    const { skillId, answers } = req.body;
+    if (!skillId || typeof skillId !== 'string') {
+      return res.status(400).json({ message: 'Valid skillId is required' });
+    }
+    if (!answers || !Array.isArray(answers)) {
+      return res.status(400).json({ message: 'Answers must be provided as an array' });
+    }
+
     const userId = req.user.id;
     
     // 1. Find the student profile associated with the user
@@ -26,6 +33,11 @@ const submitAssessment = async (req, res) => {
 
     if (!student) {
       return res.status(404).json({ message: 'Student profile not found' });
+    }
+
+    const skill = await prisma.skill.findUnique({ where: { id: skillId } });
+    if (!skill) {
+      return res.status(404).json({ message: 'Skill not found' });
     }
 
     const questions = await prisma.assessmentQuestion.findMany({

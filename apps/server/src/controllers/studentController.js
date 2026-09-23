@@ -84,17 +84,42 @@ const updateCareerGoal = async (req, res) => {
     const userId = req.user.id;
     const { careerGoalId } = req.body;
 
+    if (!careerGoalId || typeof careerGoalId !== 'string') {
+      return res.status(400).json({ message: 'Valid careerGoalId is required' });
+    }
+
     const student = await prisma.student.findFirst({ where: { userId } });
     if (!student) return res.status(404).json({ message: 'Student profile not found' });
+
+    const role = await prisma.careerRole.findUnique({ where: { id: careerGoalId } });
+    if (!role) return res.status(404).json({ message: 'Career role not found' });
 
     await prisma.student.update({
       where: { id: student.id },
       data: { careerGoalId }
     });
-    res.json({ message: 'Career goal updated' });
+    res.json({ message: 'Career goal updated successfully', role: role.title });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-module.exports = { getStudentProfile, getResumeData, updateCareerGoal };
+const getAllStudents = async (req, res) => {
+  try {
+    const students = await prisma.student.findMany({
+      include: {
+        user: { select: { firstName: true, lastName: true, email: true } },
+        careerGoal: true,
+        skills: { include: { skill: true } },
+        projects: true,
+        certificates: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error retrieving students', error: error.message });
+  }
+};
+
+module.exports = { getStudentProfile, getResumeData, updateCareerGoal, getAllStudents };

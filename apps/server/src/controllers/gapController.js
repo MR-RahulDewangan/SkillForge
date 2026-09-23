@@ -61,7 +61,9 @@ const analyzeSkillGap = async (req, res) => {
       totalScoreRatio += Math.min(studentScore, requiredScore) / requiredScore;
     }
 
-    const readiness = Math.round((totalScoreRatio / requiredSkills.length) * 100);
+    const readiness = requiredSkills.length > 0 
+      ? Math.round((totalScoreRatio / requiredSkills.length) * 100) 
+      : 100;
 
     // 3. Fetch Learning Recommendations
     const recommendations = [];
