@@ -16,11 +16,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "ollama")
-AI_MODEL = os.getenv("AI_MODEL", "llama3")
+# Native .env loader
+def load_env_file():
+    candidates = [
+        os.path.join(os.path.dirname(__file__), "..", ".env"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"),
+        ".env"
+    ]
+    for env_path in candidates:
+        if os.path.exists(env_path):
+            try:
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            k = k.strip()
+                            v = v.strip().strip('"').strip("'")
+                            if k not in os.environ:
+                                os.environ[k] = v
+                break
+            except Exception:
+                pass
 
-# Initialize client pointing to local Ollama by default or custom API
+load_env_file()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if GEMINI_API_KEY:
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
+    OPENAI_API_KEY = GEMINI_API_KEY
+    AI_MODEL = os.getenv("AI_MODEL", "gemini-1.5-flash")
+    print(f"[AI SERVICE] Initialized with Google Gemini ({AI_MODEL}) via Google AI Studio API.")
+else:
+    OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "ollama")
+    AI_MODEL = os.getenv("AI_MODEL", "llama3")
+    print(f"[AI SERVICE] Initialized with endpoint {OLLAMA_BASE_URL} ({AI_MODEL}).")
+
+# Initialize client pointing to Gemini / Ollama / OpenAI
 client = OpenAI(base_url=OLLAMA_BASE_URL, api_key=OPENAI_API_KEY)
 
 class ResumeData(BaseModel):
