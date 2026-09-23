@@ -17,6 +17,7 @@
   * **Backend API**: Node.js v24, Express 4.18, Prisma ORM v5, PostgreSQL 16, JWT, Bcryptjs, Multer, Zod.
   * **AI Microservice**: Python 3.12, FastAPI, Uvicorn, OpenAI SDK, PyMuPDF, Google AI Studio Gemini API (`gemini-3.6-flash`).
   * **DevOps**: Docker, Docker Compose, GitHub Actions CI/CD pipeline (`.github/workflows/ci.yml`).
+* **GitHub Repository**: [https://github.com/MR-RahulDewangan/SkillForge.git](https://github.com/MR-RahulDewangan/SkillForge.git)
 * **Active Port Mapping**:
   * Frontend: `http://localhost:3000`
   * Backend API: `http://localhost:5000`
