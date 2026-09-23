@@ -9,8 +9,9 @@ The project is a monorepo consisting of three main applications:
 ## 🛠️ Technical Stack
 - **Frontend**: React, Vite, Tailwind, React Router, Zustand.
 - **Backend**: Node.js, Express, Prisma, PostgreSQL.
-- **AI**: FastAPI, OpenAI API (GPT-4o), PyMuPDF.
-- **Auth**: JWT-based authentication with Role-Based Access Control (RBAC).
+- **AI**: FastAPI, Local Ollama (`http://localhost:11434/v1`) / OpenAI-compatible API, PyMuPDF with rule-based fallback.
+- **Auth**: JWT-based authentication with Role-Based Access Control (RBAC) and Axios client request interceptors.
+- **Version Control**: Git repository initialized with strict `.gitignore` protecting secrets and build artifacts.
 
 ## 🗄️ Database Schema
 The database is managed via Prisma and includes models for:
@@ -26,8 +27,8 @@ The database is managed via Prisma and includes models for:
 
 ## 🔌 API Integration
 - **Backend $\rightarrow$ AI**: The server interacts with the AI service for unstructured data extraction (Resumes/JDs).
-- **Frontend $\rightarrow$ Backend**: REST API utilizing Bearer tokens for authentication.
+- **Frontend $\rightarrow$ Backend**: REST API utilizing Bearer tokens for authentication (via Axios request interceptor).
 
 ## 🚦 Environment Configuration
-- Uses `.env` files for `DATABASE_URL`, `JWT_SECRET`, and `OPENAI_API_KEY`.
-- Port mapping: Frontend (5173), Backend (5000), AI Service (8000).
+- Uses `.env` files for `DATABASE_URL`, `JWT_SECRET`, `PORT`, and `AI_SERVICE_URL`.
+- Port mapping: Frontend (3000), Backend (5000), AI Service (8000).

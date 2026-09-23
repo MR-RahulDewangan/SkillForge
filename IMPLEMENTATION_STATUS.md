@@ -13,21 +13,21 @@ This document tracks the progress of the Academia–Industry Collaboration Porta
 | Skill Gap Analysis | [COMPLETE] | Gap calculation vs industry requirements. |
 | Learning Recs | [COMPLETE] | Courses suggested based on gap analysis. |
 | Digital Portfolio | [COMPLETE] | Projects and Certificates CRUD + Verification. |
-| Internship Search | [PARTIAL] | Opportunities exist in DB; frontend search is basic. |
-| Job Search | [PARTIAL] | Opportunities exist in DB; frontend search is basic. |
-| Opportunity Matching | [COMPLETE] | Deterministic match scoring implemented. |
-| Applications | [PARTIAL] | Application model exists; flow needs polish. |
+| Internship Search | [COMPLETE] | Searchable listing with live deterministic match percentage. |
+| Job Search | [COMPLETE] | Filter by type, mode, and location. |
+| Opportunity Matching | [COMPLETE] | Deterministic formula (70/20/10) with explainable breakdown. |
+| Applications | [COMPLETE] | One-click apply and status tracking flow implemented. |
 | Resume Generation | [MISSING] | No automated resume builder yet. |
-| Career Assistant | [PARTIAL] | AI endpoint exists; frontend integration pending. |
+| Career Assistant | [COMPLETE] | UI integrated in Student Dashboard with local Ollama fallback. |
 
 ## 🏢 Industry Features
 | Feature | Status | Notes |
 | :--- | :--- | :--- |
-| Company Profile | [COMPLETE] | Basic CRUD and verification status. |
-| Opportunity Posting | [PARTIAL] | Backend support exists; frontend form needed. |
-| Applicant Mgmt | [PARTIAL] | Backend routes exist; dashboard needs polish. |
-| Candidate Matching | [PARTIAL] | Scoring logic exists; recruiter view pending. |
-| Recruitment Analytics | [MISSING] | No industry-specific analytics yet. |
+| Company Profile | [COMPLETE] | Profile management and verification status. |
+| Opportunity Posting | [COMPLETE] | PostOpportunityModal + Zod validation + backend endpoints. |
+| Applicant Mgmt | [COMPLETE] | Recruiter ATS view with status changer. |
+| Candidate Matching | [COMPLETE] | 70/20/10 compatibility calculation per applicant. |
+| Recruitment Analytics | [PARTIAL] | Accessible via Institution overview. |
 
 ## 🏫 Faculty/Institution Features
 | Feature | Status | Notes |
@@ -35,14 +35,15 @@ This document tracks the progress of the Academia–Industry Collaboration Porta
 | Faculty Profile | [MISSING] | No specific faculty profile management. |
 | Verification | [COMPLETE] | Portfolio and Skill verification implemented. |
 | Student Analytics | [COMPLETE] | Institution-wide KPI dashboards. |
-| Industry Demand Analytics | [MISSING] | No global demand tracking across industries. |
-| Placement Analytics | [PARTIAL] | Basic application tracking exists. |
+| Industry Demand Analytics | [COMPLETE] | Tracked across posted opportunities. |
+| Placement Analytics | [COMPLETE] | Placement funnel breakdown. |
 
 ## ⚙️ System-Wide
 | Feature | Status | Notes |
 | :--- | :--- | :--- |
 | RBAC | [COMPLETE] | `authenticate` and `authorize` middleware implemented. |
-| AI Integrations | [PARTIAL] | Parsing and Assistant endpoints ready. |
+| AI Integrations | [COMPLETE] | Local Ollama + fallback parsing and guidance. |
 | Matching Engine | [COMPLETE] | Deterministic formula (70/20/10) implemented. |
-| Seed Data | [COMPLETE] | Basic roles, skills, and users populated. |
-| Input Validation | [NEEDS TESTING] | Zod/Joi validation not yet comprehensive. |
+| Seed Data | [COMPLETE] | Full roles, skills, questions, company, and opportunity seeded. |
+| Input Validation | [COMPLETE] | Zod schemas implemented for Auth, Opportunity, and Portfolio. |
+| Error Handling | [COMPLETE] | Centralized Express error handler middleware. |
