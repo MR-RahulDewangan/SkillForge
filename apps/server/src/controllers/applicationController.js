@@ -33,8 +33,12 @@ const applyToOpportunity = async (req, res) => {
     if (opp.requiredDegree && student.degree && student.degree.toLowerCase() !== opp.requiredDegree.toLowerCase()) {
       return res.status(400).json({ message: `Degree ${opp.requiredDegree} required` });
     }
-    if (opp.requiredBranch && student.branch && student.branch.toLowerCase() !== opp.requiredBranch.toLowerCase()) {
-      return res.status(400).json({ message: `Branch ${opp.requiredBranch} required` });
+    if (opp.requiredBranch && student.branch) {
+      const bReq = opp.requiredBranch.toLowerCase().trim();
+      const bStud = student.branch.toLowerCase().trim();
+      if (bReq !== bStud && !bStud.includes(bReq) && !bReq.includes(bStud)) {
+        return res.status(400).json({ message: `Branch ${opp.requiredBranch} required` });
+      }
     }
     if (opp.graduationYear && student.gradYear && student.gradYear !== opp.graduationYear) {
       return res.status(400).json({ message: `Graduation year ${opp.graduationYear} required` });

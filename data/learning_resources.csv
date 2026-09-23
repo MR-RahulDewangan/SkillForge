@@ -1,0 +1,9 @@
+resource_id,title,provider,resource_type,skill_id,difficulty,url,duration,is_free,source_id,status
+RES001,PostgreSQL Tutorial for Beginners,freeCodeCamp,VIDEO,SK003,BEGINNER,https://www.freecodecamp.org/news/postgresql-tutorial/,4 hours,true,SRC001,ACTIVE
+RES002,The Official Python Documentation,Python Software Foundation,DOCUMENTATION,SK001,INTERMEDIATE,https://docs.python.org/3/tutorial/,Self-paced,true,SRC001,ACTIVE
+RES003,React Quick Start & Interactive Guide,React Core Team,DOCUMENTATION,SK004,BEGINNER,https://react.dev/learn,Self-paced,true,SRC001,ACTIVE
+RES004,Node.js Architecture and APIs,Node.js Foundation,DOCUMENTATION,SK005,INTERMEDIATE,https://nodejs.org/docs/latest/api/,Self-paced,true,SRC001,ACTIVE
+RES005,Docker Get Started Guide,Docker Inc,TUTORIAL,SK007,BEGINNER,https://docs.docker.com/get-started/,2 hours,true,SRC001,ACTIVE
+RES006,SQL for Data Analysis,Mode Analytics,TUTORIAL,SK002,INTERMEDIATE,https://mode.com/sql-tutorial/,8 hours,true,SRC001,ACTIVE
+RES007,TypeScript for JavaScript Programmers,Microsoft,DOCUMENTATION,SK006,INTERMEDIATE,https://www.typescriptlang.org/docs/,3 hours,true,SRC001,ACTIVE
+RES008,Power BI Guided Learning Path,Microsoft Learn,COURSE,SK010,BEGINNER,https://learn.microsoft.com/power-bi/,5 hours,true,SRC001,ACTIVE

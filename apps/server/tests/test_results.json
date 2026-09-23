@@ -285,7 +285,7 @@
         {
           "name": "Deterministic Formula Verification (70/20/10)",
           "passed": true,
-          "detail": "Calculated 92 vs expected 92"
+          "detail": "Calculated 93 vs expected 93"
         },
         {
           "name": "Explainable Breakdown Present",

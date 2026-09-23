@@ -1,0 +1,5 @@
+company_id,company_name,industry,description,website,location,verification_status,source_id
+COMP001,NexaTech Systems,Enterprise Software,Cloud software and scalable workflow engines,https://demo.nexatech.internal,Bengaluru,DEMO,SRC001
+COMP002,DataPulse Analytics,Data Intelligence,Predictive analytics and business reporting services,https://demo.datapulse.internal,Hyderabad,DEMO,SRC001
+COMP003,CloudScale Labs,Cloud & DevOps,Infrastructure engineering and Kubernetes consulting,https://demo.cloudscale.internal,Pune,DEMO,SRC001
+COMP004,Apex Digital FinTech,Financial Technology,Next-generation payment systems and banking APIs,https://demo.apexdigital.internal,Mumbai,DEMO,SRC001

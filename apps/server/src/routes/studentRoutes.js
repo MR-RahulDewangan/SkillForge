@@ -4,6 +4,7 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/all', authenticate, authorize('FACULTY', 'INSTITUTION_ADMIN'), getAllStudents);
+router.get('/profile', authenticate, getStudentProfile);
 router.get('/profile/:id', authenticate, getStudentProfile);
 router.get('/resume', authenticate, authorize('STUDENT'), getResumeData);
 router.post('/career-goal', authenticate, authorize('STUDENT'), updateCareerGoal);

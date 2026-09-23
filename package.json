@@ -4,5 +4,9 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0"
+  },
+  "prisma": {
+    "schema": "apps/server/prisma/schema.prisma",
+    "seed": "node apps/server/prisma/seed.js"
   }
 }

@@ -11,6 +11,7 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/overview', authenticate, authorize('INSTITUTION_ADMIN'), getInstitutionOverview);
+router.get('/institution/overview', authenticate, authorize('INSTITUTION_ADMIN'), getInstitutionOverview);
 router.get('/industry-demand', authenticate, authorize('INSTITUTION_ADMIN'), getIndustryDemand);
 router.get('/student-gaps', authenticate, authorize('INSTITUTION_ADMIN'), getStudentGaps);
 router.get('/funnel', authenticate, authorize('INSTITUTION_ADMIN'), getPlacementFunnel);

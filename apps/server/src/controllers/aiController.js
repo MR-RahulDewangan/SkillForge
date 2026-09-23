@@ -266,7 +266,7 @@ const askAssistant = async (req, res) => {
       return !s || s.score < rs.minRequiredScore;
     }).map(rs => rs.skillId);
 
-    const recommendedCourses = await prisma.course.findMany({
+    const recommendedCourses = await prisma.learningResource.findMany({
       where: { skillId: { in: deficitSkillIds } },
       include: { skill: true },
       take: 3

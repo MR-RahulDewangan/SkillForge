@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const VALID_TYPES = ['INTERNSHIP', 'JOB', 'APPRENTICESHIP'];
+const VALID_TYPES = ['INTERNSHIP', 'JOB', 'APPRENTICESHIP', 'FULL_TIME'];
 const VALID_MODES = ['REMOTE', 'ONSITE', 'HYBRID'];
 
 const createOpportunity = async (req, res) => {

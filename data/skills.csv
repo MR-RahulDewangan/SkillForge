@@ -1,0 +1,16 @@
+skill_id,skill_name,category,sub_category,description,status
+SK001,Python,Technical,Programming,Programming language for backend and data science,ACTIVE
+SK002,SQL,Technical,Database,Relational database query language,ACTIVE
+SK003,PostgreSQL,Technical,Database,Open source relational database management system,ACTIVE
+SK004,React,Technical,Frontend,JavaScript library for building user interfaces,ACTIVE
+SK005,Node.js,Technical,Backend,JavaScript runtime environment,ACTIVE
+SK006,TypeScript,Technical,Programming,Typed superset of JavaScript,ACTIVE
+SK007,Docker,Technical,DevOps,Platform for containerizing applications,ACTIVE
+SK008,Git,Technical,Tools,Distributed version control system,ACTIVE
+SK009,REST APIs,Technical,Backend,Architectural style for web services,ACTIVE
+SK010,Power BI,Technical,Data Analysis,Business intelligence and visualization tool,ACTIVE
+SK011,Tailwind CSS,Technical,Frontend,Utility-first CSS framework,ACTIVE
+SK012,Machine Learning,Technical,AI/ML,Algorithms and models for predictive analytics,ACTIVE
+SK013,Communication,Soft,Professional,Ability to convey technical ideas clearly,ACTIVE
+SK014,Problem Solving,Soft,Cognitive,Structured approach to troubleshooting issues,ACTIVE
+SK015,Team Collaboration,Soft,Professional,Working effectively across multidisciplinary teams,ACTIVE

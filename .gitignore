@@ -2,8 +2,15 @@
 node_modules/
 apps/*/node_modules/
 .venv/
+venv/
+apps/*/venv/
 __pycache__/
 *.pyc
+
+# Uploads
+apps/server/uploads/*
+!apps/server/uploads/.gitkeep
+uploads/
 
 # Environment & Secrets (CRITICAL)
 .env

@@ -1,317 +1,754 @@
-const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
+const csv = require('csv-parser');
 const bcrypt = require('bcryptjs');
+const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-async function main() {
-  const password = await bcrypt.hash('password123', 10);
+// Helper to locate the root data directory
+function findDataDir() {
+  const candidates = [
+    path.resolve(__dirname, '../../../data'), // from apps/server/prisma
+    path.resolve(__dirname, '../../data'),
+    path.resolve(__dirname, '../data'),
+    path.resolve(process.cwd(), 'data'),
+    path.resolve(process.cwd(), '../data'),
+  ];
+  for (const dir of candidates) {
+    if (fs.existsSync(dir) && fs.existsSync(path.join(dir, 'skills.csv'))) {
+      return dir;
+    }
+  }
+  throw new Error(`Data directory not found. Candidates checked:\n${candidates.join('\n')}`);
+}
 
-  const admin = await prisma.user.upsert({
+// Helper to parse a CSV file into array of trimmed objects
+function parseCsvFile(filePath) {
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(filePath)) {
+      return reject(new Error(`CSV file not found: ${filePath}`));
+    }
+    const results = [];
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (raw) => {
+        const clean = {};
+        for (const [key, val] of Object.entries(raw)) {
+          const trimmedKey = key.trim();
+          const trimmedVal = typeof val === 'string' ? val.trim() : val;
+          clean[trimmedKey] = trimmedVal === '' ? null : trimmedVal;
+        }
+        results.push(clean);
+      })
+      .on('end', () => resolve(results))
+      .on('error', (err) => reject(err));
+  });
+}
+
+// Convert difficulty string to number
+function difficultyToNumber(diff) {
+  if (!diff) return 1;
+  const upper = diff.toUpperCase();
+  if (upper === 'BEGINNER') return 1;
+  if (upper === 'INTERMEDIATE') return 2;
+  if (upper === 'ADVANCED') return 3;
+  const parsed = parseInt(diff, 10);
+  return isNaN(parsed) ? 1 : parsed;
+}
+
+async function main() {
+  const dataDir = findDataDir();
+  console.log(`[SEED] Using CSV data directory: ${dataDir}`);
+
+  const defaultPasswordHash = await bcrypt.hash('password123', 10);
+  const orphanReports = [];
+
+  // Create PostgreSQL compatibility views if not present
+  try {
+    await prisma.$executeRawUnsafe('CREATE OR REPLACE VIEW "CareerSkill" AS SELECT * FROM "CareerRoleSkill"');
+    await prisma.$executeRawUnsafe('CREATE OR REPLACE VIEW "LearningResource" AS SELECT * FROM "Course"');
+  } catch (vErr) {
+    console.warn('[SEED] Note on view creation:', vErr.message);
+  }
+
+  // 0. Seed or Ensure Baseline Admin & Faculty Accounts
+  console.log('\n[0/9] Ensuring system baseline accounts (Admin & Faculty)...');
+  await prisma.user.upsert({
     where: { email: 'admin@institution.edu' },
     update: {},
-    create: { email: 'admin@institution.edu', password, firstName: 'Admin', lastName: 'User', role: 'INSTITUTION_ADMIN' },
-  });
-
-  const studentsData = [
-    { email: 'student1@university.edu', firstName: 'Alice', lastName: 'One' },
-    { email: 'student2@university.edu', firstName: 'Bob', lastName: 'Two' },
-    { email: 'student3@university.edu', firstName: 'Charlie', lastName: 'Three' },
-    { email: 'student4@university.edu', firstName: 'Diana', lastName: 'Four' },
-    { email: 'student5@university.edu', firstName: 'Ethan', lastName: 'Five' },
-  ];
-
-  const studentProfiles = [];
-  for (const s of studentsData) {
-    const user = await prisma.user.upsert({
-      where: { email: s.email },
-      update: {},
-      create: { email: s.email, password, firstName: s.firstName, lastName: s.lastName, role: 'STUDENT' },
-    });
-    const profile = await prisma.student.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: { userId: user.id },
-    });
-    studentProfiles.push(profile);
-  }
-
-  const skillNames = ['SQL', 'Python', 'Power BI', 'Statistics', 'Communication'];
-  const createdSkills = [];
-  for (const name of skillNames) {
-    const skill = await prisma.skill.upsert({
-      where: { name },
-      update: {},
-      create: { name, category: 'Technical' },
-    });
-    createdSkills.push(skill);
-  }
-
-  const dataAnalyst = await prisma.careerRole.upsert({
-    where: { title: 'Data Analyst' },
-    update: {},
-    create: { title: 'Data Analyst', description: 'Analyze data to provide business insights' },
-  });
-
-  for (const skill of createdSkills) {
-    await prisma.careerRoleSkill.upsert({
-      where: { careerRoleId_skillId: { careerRoleId: dataAnalyst.id, skillId: skill.id } },
-      update: {},
-      create: { careerRoleId: dataAnalyst.id, skillId: skill.id, minRequiredScore: 75 },
-    });
-  }
-
-  const courses = [
-    { title: 'Advanced SQL Mastery', provider: 'Coursera', skillId: createdSkills[0].id, url: 'http://coursera.org/sql' },
-    { title: 'Python for Data Science', provider: 'Udemy', skillId: createdSkills[1].id, url: 'http://udemy.com/python' },
-    { title: 'Power BI Dashboarding', provider: 'Microsoft', skillId: createdSkills[2].id, url: 'http://ms.com/pbi' },
-    { title: 'Practical Statistics', provider: 'Khan Academy', skillId: createdSkills[3].id, url: 'http://khan.org/stats' },
-    { title: 'Professional Communication', provider: 'LinkedIn Learning', skillId: createdSkills[4].id, url: 'http://linkedin.com/comm' },
-  ];
-
-  for (const c of courses) {
-    const existingCourse = await prisma.course.findFirst({ where: { title: c.title } });
-    if (!existingCourse) {
-      await prisma.course.create({ data: c });
+    create: {
+      email: 'admin@institution.edu',
+      password: defaultPasswordHash,
+      firstName: 'Admin',
+      lastName: 'Institution',
+      role: 'INSTITUTION_ADMIN'
     }
-  }
-
-  const profiles = studentProfiles;
-  const skillIds = createdSkills.map(s => s.id);
-
-  await prisma.studentSkill.createMany({
-    data: [
-      { studentId: profiles[0].id, skillId: skillIds[0], score: 90 },
-      { studentId: profiles[0].id, skillId: skillIds[1], score: 85 },
-      { studentId: profiles[0].id, skillId: skillIds[2], score: 80 },
-      { studentId: profiles[0].id, skillId: skillIds[3], score: 78 },
-      { studentId: profiles[0].id, skillId: skillIds[4], score: 70 },
-    ],
-    skipDuplicates: true
   });
 
-  await prisma.studentSkill.createMany({
-    data: [
-      { studentId: profiles[1].id, skillId: skillIds[0], score: 70 },
-      { studentId: profiles[1].id, skillId: skillIds[1], score: 60 },
-      { studentId: profiles[1].id, skillId: skillIds[2], score: 90 },
-      { studentId: profiles[1].id, skillId: skillIds[3], score: 50 },
-      { studentId: profiles[1].id, skillId: skillIds[4], score: 80 },
-    ],
-    skipDuplicates: true
-  });
-
-  await prisma.studentSkill.createMany({
-    data: [
-      { studentId: profiles[2].id, skillId: skillIds[0], score: 30 },
-      { studentId: profiles[2].id, skillId: skillIds[1], score: 40 },
-      { studentId: profiles[2].id, skillId: skillIds[2], score: 20 },
-      { studentId: profiles[2].id, skillId: skillIds[3], score: 10 },
-      { studentId: profiles[2].id, skillId: skillIds[4], score: 50 },
-    ],
-    skipDuplicates: true
-  });
-
-  // Seed sample verified project and certificate for Alice
-  const existingProj = await prisma.project.findFirst({
-    where: { studentId: profiles[0].id, name: 'E-Commerce Analytics Engine' }
-  });
-  if (!existingProj) {
-    await prisma.project.create({
-      data: {
-        studentId: profiles[0].id,
-        name: 'E-Commerce Analytics Engine',
-        description: 'Engineered an end-to-end data pipeline using Python, PostgreSQL, and Power BI analyzing 500K+ transaction records to forecast cohort retention and customer lifetime value.',
-        url: 'https://github.com/alice-one/ecommerce-analytics',
-        isVerified: true
-      }
-    });
-  }
-
-  const existingCert = await prisma.certificate.findFirst({
-    where: { studentId: profiles[0].id, name: 'Microsoft Certified: Power BI Data Analyst Associate' }
-  });
-  if (!existingCert) {
-    await prisma.certificate.create({
-      data: {
-        studentId: profiles[0].id,
-        name: 'Microsoft Certified: Power BI Data Analyst Associate',
-        issuer: 'Microsoft',
-        issueDate: new Date('2025-11-15'),
-        url: 'https://learn.microsoft.com/credentials',
-        isVerified: true
-      }
-    });
-  }
-
-  for (const p of profiles) {
-    await prisma.student.update({ 
-      where: { id: p.id }, 
-      data: { 
-        careerGoalId: dataAnalyst.id,
-        degree: 'B.Tech',
-        branch: 'Computer Science',
-        cgpa: 8.4,
-        gradYear: 2026
-      } 
-    });
-  }
-
-  // 6. Assessment Questions
-  const questionsData = [
-    {
-      skillId: createdSkills[0].id, // SQL
-      questionText: 'Which clause is used in SQL to filter grouping results created by GROUP BY?',
-      options: ['WHERE', 'HAVING', 'ORDER BY', 'FILTER'],
-      correctOption: 1,
-      difficulty: 2
-    },
-    {
-      skillId: createdSkills[0].id,
-      questionText: 'What is the primary function of a LEFT JOIN in SQL?',
-      options: [
-        'Returns rows only when there is a match in both tables',
-        'Returns all rows from the right table and matching rows from the left table',
-        'Returns all rows from the left table and matching rows from the right table',
-        'Deletes duplicate rows from the left table'
-      ],
-      correctOption: 2,
-      difficulty: 1
-    },
-    {
-      skillId: createdSkills[1].id, // Python
-      questionText: 'Which of the following built-in Python data types is immutable?',
-      options: ['List', 'Dictionary', 'Set', 'Tuple'],
-      correctOption: 3,
-      difficulty: 1
-    },
-    {
-      skillId: createdSkills[1].id,
-      questionText: 'In Python, what is the output of bool([])?',
-      options: ['True', 'False', 'None', 'Error'],
-      correctOption: 1,
-      difficulty: 1
-    },
-    {
-      skillId: createdSkills[2].id, // Power BI
-      questionText: 'What expression language is primarily used in Power BI for calculated columns and measures?',
-      options: ['M Query', 'DAX', 'SQL', 'VBA'],
-      correctOption: 1,
-      difficulty: 2
-    },
-    {
-      skillId: createdSkills[3].id, // Statistics
-      questionText: 'What statistical measure indicates the spread of data points around the mean?',
-      options: ['Median', 'Standard Deviation', 'Mode', 'Range'],
-      correctOption: 1,
-      difficulty: 1
-    },
-    {
-      skillId: createdSkills[4].id, // Communication
-      questionText: 'What is a core principle of active listening in collaborative work environments?',
-      options: [
-        'Formulating your rebuttal while the other person is speaking',
-        'Paraphrasing key points to confirm understanding before responding',
-        'Interrupting to show engagement',
-        'Remaining completely silent without physical or verbal cues'
-      ],
-      correctOption: 1,
-      difficulty: 1
-    }
-  ];
-
-  for (const q of questionsData) {
-    const existing = await prisma.assessmentQuestion.findFirst({
-      where: { questionText: q.questionText }
-    });
-    if (!existing) {
-      await prisma.assessmentQuestion.create({ data: q });
-    }
-  }
-
-  // 7. Industry Partner & Company
-  const recruiterUser = await prisma.user.upsert({
-    where: { email: 'recruiter@innovatetech.com' },
+  await prisma.user.upsert({
+    where: { email: 'faculty1@university.edu' },
     update: {},
     create: {
-      email: 'recruiter@innovatetech.com',
-      password,
-      firstName: 'Sarah',
-      lastName: 'Jenkins',
-      role: 'INDUSTRY'
+      email: 'faculty1@university.edu',
+      password: defaultPasswordHash,
+      firstName: 'Prof.',
+      lastName: 'Sharma',
+      role: 'FACULTY'
     }
   });
 
-  const company = await prisma.company.upsert({
-    where: { userId: recruiterUser.id },
-    update: {},
-    create: {
-      userId: recruiterUser.id,
-      name: 'InnovateTech Analytics',
-      industry: 'Data & Artificial Intelligence',
-      website: 'https://innovatetech.example.com',
-      description: 'Leading provider of enterprise analytics and AI solutions.',
-      isVerified: true,
-      location: 'Bangalore, India'
+  // Clean up legacy non-standard demo skills/records if they collide with new canonical IDs
+  console.log('[PRE-SEED] Checking for legacy non-CSV records to prevent unique constraints...');
+  const legacySkills = await prisma.skill.findMany();
+  for (const s of legacySkills) {
+    if (!s.id.startsWith('SK')) {
+      // It's a legacy UUID record
+      // Clean dependent relations first
+      await prisma.studentSkill.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.opportunitySkill.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.careerSkill.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.assessmentQuestion.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.assessmentAttempt.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.learningResource.deleteMany({ where: { skillId: s.id } }).catch(() => {});
+      await prisma.skill.delete({ where: { id: s.id } }).catch(() => {});
     }
-  });
+  }
 
-  // 8. Opportunities
-  const deadlineDate = new Date();
-  deadlineDate.setDate(deadlineDate.getDate() + 30);
+  const legacyRoles = await prisma.careerRole.findMany();
+  for (const r of legacyRoles) {
+    if (!r.id.startsWith('CAREER')) {
+      await prisma.careerSkill.deleteMany({ where: { careerRoleId: r.id } }).catch(() => {});
+      await prisma.student.updateMany({ where: { careerGoalId: r.id }, data: { careerGoalId: null } }).catch(() => {});
+      await prisma.careerRole.delete({ where: { id: r.id } }).catch(() => {});
+    }
+  }
 
-  const existingOpp = await prisma.opportunity.findFirst({
-    where: { title: 'Junior Data Analyst Intern', companyId: company.id }
-  });
+  // =========================================================================
+  // 1. SKILLS (skills.csv)
+  // =========================================================================
+  console.log('\n[1/9] Seeding skills from skills.csv...');
+  const skillsData = await parseCsvFile(path.join(dataDir, 'skills.csv'));
+  const validSkillIds = new Set();
 
-  let opportunity = existingOpp;
-  if (!opportunity) {
-    opportunity = await prisma.opportunity.create({
-      data: {
-        companyId: company.id,
-        type: 'INTERNSHIP',
-        title: 'Junior Data Analyst Intern',
-        description: 'Join our data intelligence team to build real-time dashboards, perform SQL transformations, and uncover predictive business insights.',
-        location: 'Bangalore / Hybrid',
-        workMode: 'HYBRID',
-        stipend: 25000,
-        minCgpa: 7.0,
-        requiredDegree: 'B.Tech',
-        requiredBranch: 'Computer Science',
-        graduationYear: 2026,
-        deadline: deadlineDate,
-        skills: {
-          create: [
-            { skillId: createdSkills[0].id, minRequiredScore: 70 }, // SQL
-            { skillId: createdSkills[1].id, minRequiredScore: 75 }, // Python
-            { skillId: createdSkills[2].id, minRequiredScore: 65 }  // Power BI
-          ]
+  for (const row of skillsData) {
+    const { skill_id, skill_name, category, sub_category, description, status } = row;
+    if (!skill_id || !skill_name) {
+      orphanReports.push({ file: 'skills.csv', issue: 'Missing skill_id or skill_name', row });
+      continue;
+    }
+    await prisma.skill.upsert({
+      where: { id: skill_id },
+      update: {
+        name: skill_name,
+        category: category || 'Technical',
+        subCategory: sub_category,
+        description,
+        status: status || 'ACTIVE'
+      },
+      create: {
+        id: skill_id,
+        name: skill_name,
+        category: category || 'Technical',
+        subCategory: sub_category,
+        description,
+        status: status || 'ACTIVE'
+      }
+    });
+    validSkillIds.add(skill_id);
+  }
+  console.log(`✓ Seeded ${validSkillIds.size} skills.`);
+
+  // =========================================================================
+  // 2. CAREER ROLES (career_roles.csv)
+  // =========================================================================
+  console.log('\n[2/9] Seeding career roles from career_roles.csv...');
+  const rolesData = await parseCsvFile(path.join(dataDir, 'career_roles.csv'));
+  const validRoleIds = new Set();
+
+  for (const row of rolesData) {
+    const { career_id, career_name, description, industry_category, status } = row;
+    if (!career_id || !career_name) {
+      orphanReports.push({ file: 'career_roles.csv', issue: 'Missing career_id or career_name', row });
+      continue;
+    }
+    await prisma.careerRole.upsert({
+      where: { id: career_id },
+      update: {
+        title: career_name,
+        description,
+        industryCategory: industry_category,
+        status: status || 'ACTIVE'
+      },
+      create: {
+        id: career_id,
+        title: career_name,
+        description,
+        industryCategory: industry_category,
+        status: status || 'ACTIVE'
+      }
+    });
+    validRoleIds.add(career_id);
+  }
+  console.log(`✓ Seeded ${validRoleIds.size} career roles.`);
+
+  // =========================================================================
+  // 3. CAREER SKILLS (career_skills.csv)
+  // =========================================================================
+  console.log('\n[3/9] Seeding career skills from career_skills.csv...');
+  const careerSkillsData = await parseCsvFile(path.join(dataDir, 'career_skills.csv'));
+  let careerSkillCount = 0;
+
+  for (const row of careerSkillsData) {
+    const { career_id, skill_id, required_level, importance, source_id, verified } = row;
+    if (!validRoleIds.has(career_id)) {
+      orphanReports.push({ file: 'career_skills.csv', issue: `Invalid career_id: ${career_id}`, row });
+      continue;
+    }
+    if (!validSkillIds.has(skill_id)) {
+      orphanReports.push({ file: 'career_skills.csv', issue: `Invalid skill_id: ${skill_id}`, row });
+      continue;
+    }
+
+    const minRequiredScore = parseInt(required_level, 10) || 50;
+    const isVerified = verified === 'true' || verified === true || verified === 'TRUE';
+
+    await prisma.careerSkill.upsert({
+      where: {
+        careerRoleId_skillId: {
+          careerRoleId: career_id,
+          skillId: skill_id
         }
+      },
+      update: {
+        minRequiredScore,
+        importance: importance || 'CORE',
+        sourceId: source_id,
+        verified: isVerified
+      },
+      create: {
+        careerRoleId: career_id,
+        skillId: skill_id,
+        minRequiredScore,
+        importance: importance || 'CORE',
+        sourceId: source_id,
+        verified: isVerified
       }
     });
+    careerSkillCount++;
+  }
+  console.log(`✓ Seeded ${careerSkillCount} career skill mappings.`);
+
+  // =========================================================================
+  // 4. COMPANIES (companies.csv)
+  // =========================================================================
+  console.log('\n[4/9] Seeding companies from companies.csv...');
+  const companiesData = await parseCsvFile(path.join(dataDir, 'companies.csv'));
+  const validCompanyIds = new Set();
+
+  for (const row of companiesData) {
+    const { company_id, company_name, industry, description, website, location, verification_status, source_id } = row;
+    if (!company_id || !company_name) {
+      orphanReports.push({ file: 'companies.csv', issue: 'Missing company_id or company_name', row });
+      continue;
+    }
+
+    // Ensure User account exists for the company
+    const email = `contact@${company_id.toLowerCase()}.example.com`;
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {
+        firstName: company_name.split(' ')[0],
+        lastName: company_name.split(' ').slice(1).join(' ') || 'Partner',
+        role: 'INDUSTRY'
+      },
+      create: {
+        email,
+        password: defaultPasswordHash,
+        firstName: company_name.split(' ')[0],
+        lastName: company_name.split(' ').slice(1).join(' ') || 'Partner',
+        role: 'INDUSTRY'
+      }
+    });
+
+    await prisma.company.upsert({
+      where: { id: company_id },
+      update: {
+        userId: user.id,
+        name: company_name,
+        industry: industry || 'Technology',
+        description,
+        website,
+        location,
+        isVerified: true,
+        verificationStatus: verification_status || 'VERIFIED',
+        sourceId: source_id
+      },
+      create: {
+        id: company_id,
+        userId: user.id,
+        name: company_name,
+        industry: industry || 'Technology',
+        description,
+        website,
+        location,
+        isVerified: true,
+        verificationStatus: verification_status || 'VERIFIED',
+        sourceId: source_id
+      }
+    });
+    validCompanyIds.add(company_id);
+  }
+  console.log(`✓ Seeded ${validCompanyIds.size} companies.`);
+
+  // =========================================================================
+  // 5. OPPORTUNITIES (opportunities.csv)
+  // =========================================================================
+  console.log('\n[5/9] Seeding opportunities from opportunities.csv...');
+  const oppsData = await parseCsvFile(path.join(dataDir, 'opportunities.csv'));
+  const validOpportunityIds = new Set();
+
+  for (const row of oppsData) {
+    const {
+      opportunity_id,
+      company_id,
+      title,
+      opportunity_type,
+      description,
+      location,
+      work_mode,
+      duration,
+      stipend,
+      application_deadline,
+      status,
+      source_id,
+      is_demo
+    } = row;
+
+    if (!validCompanyIds.has(company_id)) {
+      orphanReports.push({ file: 'opportunities.csv', issue: `Invalid company_id: ${company_id}`, row });
+      continue;
+    }
+
+    // Map opportunity type to enum
+    let typeEnum = 'INTERNSHIP';
+    const typeUpper = (opportunity_type || '').toUpperCase();
+    if (typeUpper === 'FULL_TIME' || typeUpper === 'JOB') typeEnum = 'JOB';
+    else if (typeUpper === 'APPRENTICESHIP') typeEnum = 'APPRENTICESHIP';
+    else typeEnum = 'INTERNSHIP';
+
+    // Map work mode
+    let workModeEnum = 'HYBRID';
+    const wmUpper = (work_mode || '').toUpperCase();
+    if (wmUpper === 'REMOTE') workModeEnum = 'REMOTE';
+    else if (wmUpper === 'ONSITE') workModeEnum = 'ONSITE';
+
+    // Parse numeric stipend
+    let numericStipend = 0;
+    if (stipend) {
+      const match = stipend.match(/\d+/g);
+      if (match) numericStipend = parseFloat(match[0]);
+    }
+
+    const deadline = application_deadline ? new Date(application_deadline) : new Date('2026-12-31');
+
+    await prisma.opportunity.upsert({
+      where: { id: opportunity_id },
+      update: {
+        companyId: company_id,
+        title,
+        type: typeEnum,
+        description: description || title,
+        location: location || 'Bangalore',
+        workMode: workModeEnum,
+        duration: duration || '3 Months',
+        stipend: numericStipend,
+        rawStipend: stipend,
+        deadline,
+        status: status || 'ACTIVE',
+        sourceId: source_id,
+        isDemo: is_demo === 'true' || is_demo === true
+      },
+      create: {
+        id: opportunity_id,
+        companyId: company_id,
+        title,
+        type: typeEnum,
+        description: description || title,
+        location: location || 'Bangalore',
+        workMode: workModeEnum,
+        duration: duration || '3 Months',
+        stipend: numericStipend,
+        rawStipend: stipend,
+        deadline,
+        status: status || 'ACTIVE',
+        sourceId: source_id,
+        isDemo: is_demo === 'true' || is_demo === true
+      }
+    });
+
+    // Populate opportunity skills for matching engine
+    const defaultOppSkills = {
+      OPP001: ['SK004', 'SK005', 'SK003', 'SK008'], // Full Stack: React, Node.js, Postgres, Git
+      OPP002: ['SK001', 'SK002', 'SK010'],          // Data Analyst: Python, SQL, Power BI
+      OPP003: ['SK007', 'SK008', 'SK001'],          // DevOps: Docker, Git, Python
+      OPP004: ['SK005', 'SK003', 'SK009', 'SK007'], // Backend: Node.js, Postgres, REST APIs, Docker
+      OPP005: ['SK004', 'SK006', 'SK011'],          // Frontend: React, TypeScript, Tailwind
+      OPP006: ['SK010', 'SK002']                     // BI Reporting: Power BI, SQL
+    };
+
+    const targetSkills = defaultOppSkills[opportunity_id] || ['SK001', 'SK002'];
+    for (const skId of targetSkills) {
+      if (validSkillIds.has(skId)) {
+        await prisma.opportunitySkill.upsert({
+          where: {
+            opportunityId_skillId: {
+              opportunityId: opportunity_id,
+              skillId: skId
+            }
+          },
+          update: { minRequiredScore: 70 },
+          create: {
+            opportunityId: opportunity_id,
+            skillId: skId,
+            minRequiredScore: 70
+          }
+        });
+      }
+    }
+
+    validOpportunityIds.add(opportunity_id);
+  }
+  console.log(`✓ Seeded ${validOpportunityIds.size} opportunities with opportunity skills.`);
+
+  // =========================================================================
+  // 6. STUDENTS (students.csv)
+  // =========================================================================
+  console.log('\n[6/9] Seeding students from students.csv...');
+  const studentsData = await parseCsvFile(path.join(dataDir, 'students.csv'));
+  const validStudentIds = new Set();
+
+  // Career goal mapping for demonstration completeness
+  const studentCareerGoalMap = {
+    STU001: 'CAREER001', // Full Stack Developer
+    STU002: 'CAREER002', // Data Analyst
+    STU003: 'CAREER003', // Backend Engineer
+    STU004: 'CAREER002', // Data Analyst
+    STU005: 'CAREER005', // DevOps Engineer
+    STU006: 'CAREER004'  // Frontend Engineer
+  };
+
+  for (const row of studentsData) {
+    const { student_id, name, department, semester } = row;
+    if (!student_id || !name) {
+      orphanReports.push({ file: 'students.csv', issue: 'Missing student_id or name', row });
+      continue;
+    }
+
+    const email = `${student_id.toLowerCase()}@student.edu`;
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || 'Student';
+
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {
+        firstName,
+        lastName,
+        role: 'STUDENT'
+      },
+      create: {
+        email,
+        password: defaultPasswordHash,
+        firstName,
+        lastName,
+        role: 'STUDENT'
+      }
+    });
+
+    const careerGoalId = studentCareerGoalMap[student_id] || 'CAREER002';
+    const sem = parseInt(semester, 10) || 6;
+
+    await prisma.student.upsert({
+      where: { id: student_id },
+      update: {
+        userId: user.id,
+        department,
+        branch: department,
+        semester: sem,
+        careerGoalId: validRoleIds.has(careerGoalId) ? careerGoalId : null,
+        degree: 'B.Tech',
+        cgpa: 8.5,
+        gradYear: 2026
+      },
+      create: {
+        id: student_id,
+        userId: user.id,
+        department,
+        branch: department,
+        semester: sem,
+        careerGoalId: validRoleIds.has(careerGoalId) ? careerGoalId : null,
+        degree: 'B.Tech',
+        cgpa: 8.5,
+        gradYear: 2026
+      }
+    });
+
+    // Provide initial student skills aligned with career goal so gap analysis & matching calculate reliably
+    const sampleSkillScores = {
+      STU001: { SK004: 85, SK005: 80, SK003: 75, SK008: 70 },
+      STU002: { SK001: 80, SK002: 85, SK010: 75, SK014: 70 },
+      STU003: { SK005: 85, SK003: 80, SK009: 80, SK007: 65 },
+      STU004: { SK001: 70, SK002: 60, SK010: 55, SK014: 65 },
+      STU005: { SK007: 90, SK008: 85, SK001: 70 },
+      STU006: { SK004: 90, SK006: 80, SK011: 80 }
+    };
+
+    const initialScores = sampleSkillScores[student_id] || {};
+    for (const [sId, score] of Object.entries(initialScores)) {
+      if (validSkillIds.has(sId)) {
+        await prisma.studentSkill.upsert({
+          where: {
+            studentId_skillId: {
+              studentId: student_id,
+              skillId: sId
+            }
+          },
+          update: { score, isVerified: true },
+          create: {
+            studentId: student_id,
+            skillId: sId,
+            score,
+            isVerified: true
+          }
+        });
+      }
+    }
+
+    validStudentIds.add(student_id);
+  }
+  console.log(`✓ Seeded ${validStudentIds.size} students with User logins and profile links.`);
+
+  // =========================================================================
+  // 7. ASSESSMENT QUESTIONS (assessment_questions.csv)
+  // =========================================================================
+  console.log('\n[7/9] Seeding assessment questions from assessment_questions.csv...');
+  const questionsData = await parseCsvFile(path.join(dataDir, 'assessment_questions.csv'));
+  let questionCount = 0;
+
+  for (const row of questionsData) {
+    const {
+      question_id,
+      skill_id,
+      question_text,
+      question_type,
+      difficulty,
+      options,
+      correct_answer,
+      score,
+      explanation,
+      source_id,
+      status
+    } = row;
+
+    if (!validSkillIds.has(skill_id)) {
+      orphanReports.push({ file: 'assessment_questions.csv', issue: `Invalid skill_id: ${skill_id}`, row });
+      continue;
+    }
+
+    // Parse options from JSON format e.g. {"A":"WHERE","B":"HAVING",...}
+    let parsedOptions = [];
+    try {
+      const optsObj = JSON.parse(options);
+      parsedOptions = ['A', 'B', 'C', 'D'].map((k) => optsObj[k] || '');
+    } catch {
+      parsedOptions = (options || '').split('|').map((o) => o.trim());
+    }
+
+    const answerLetter = (correct_answer || 'A').toUpperCase();
+    const correctOptionIndex = { A: 0, B: 1, C: 2, D: 3 }[answerLetter] ?? 0;
+    const numericScore = parseInt(score, 10) || 10;
+    const difficultyNum = difficultyToNumber(difficulty);
+
+    await prisma.assessmentQuestion.upsert({
+      where: { id: question_id },
+      update: {
+        skillId: skill_id,
+        questionText: question_text,
+        questionType: question_type || 'MCQ',
+        options: parsedOptions,
+        correctOption: correctOptionIndex,
+        correctAnswer: answerLetter,
+        difficulty: difficultyNum,
+        difficultyLevel: difficulty || 'INTERMEDIATE',
+        score: numericScore,
+        explanation,
+        sourceId: source_id,
+        status: status || 'ACTIVE'
+      },
+      create: {
+        id: question_id,
+        skillId: skill_id,
+        questionText: question_text,
+        questionType: question_type || 'MCQ',
+        options: parsedOptions,
+        correctOption: correctOptionIndex,
+        correctAnswer: answerLetter,
+        difficulty: difficultyNum,
+        difficultyLevel: difficulty || 'INTERMEDIATE',
+        score: numericScore,
+        explanation,
+        sourceId: source_id,
+        status: status || 'ACTIVE'
+      }
+    });
+    questionCount++;
+  }
+  console.log(`✓ Seeded ${questionCount} assessment questions.`);
+
+  // =========================================================================
+  // 8. LEARNING RESOURCES (learning_resources.csv)
+  // =========================================================================
+  console.log('\n[8/9] Seeding learning resources from learning_resources.csv...');
+  const resourcesData = await parseCsvFile(path.join(dataDir, 'learning_resources.csv'));
+  let resourceCount = 0;
+
+  for (const row of resourcesData) {
+    const {
+      resource_id,
+      title,
+      provider,
+      resource_type,
+      skill_id,
+      difficulty,
+      url,
+      duration,
+      is_free,
+      source_id,
+      status
+    } = row;
+
+    if (!validSkillIds.has(skill_id)) {
+      orphanReports.push({ file: 'learning_resources.csv', issue: `Invalid skill_id: ${skill_id}`, row });
+      continue;
+    }
+
+    const freeBool = is_free === 'true' || is_free === true || is_free === 'TRUE';
+
+    await prisma.learningResource.upsert({
+      where: { id: resource_id },
+      update: {
+        title,
+        provider,
+        resourceType: resource_type || 'COURSE',
+        skillId: skill_id,
+        difficulty: difficulty || 'BEGINNER',
+        url,
+        duration: duration || 'Self-paced',
+        isFree: freeBool,
+        sourceId: source_id,
+        status: status || 'ACTIVE'
+      },
+      create: {
+        id: resource_id,
+        title,
+        provider,
+        resourceType: resource_type || 'COURSE',
+        skillId: skill_id,
+        difficulty: difficulty || 'BEGINNER',
+        url,
+        duration: duration || 'Self-paced',
+        isFree: freeBool,
+        sourceId: source_id,
+        status: status || 'ACTIVE'
+      }
+    });
+    resourceCount++;
+  }
+  console.log(`✓ Seeded ${resourceCount} learning resources.`);
+
+  // =========================================================================
+  // 9. APPLICATIONS (applications.csv)
+  // =========================================================================
+  console.log('\n[9/9] Seeding applications from applications.csv...');
+  const applicationsData = await parseCsvFile(path.join(dataDir, 'applications.csv'));
+  let applicationCount = 0;
+
+  for (const row of applicationsData) {
+    const { application_id, student_id, opportunity_id, status } = row;
+
+    if (!validStudentIds.has(student_id)) {
+      orphanReports.push({ file: 'applications.csv', issue: `Invalid student_id: ${student_id}`, row });
+      continue;
+    }
+    if (!validOpportunityIds.has(opportunity_id)) {
+      orphanReports.push({ file: 'applications.csv', issue: `Invalid opportunity_id: ${opportunity_id}`, row });
+      continue;
+    }
+
+    // Validate enum status
+    let appStatus = 'APPLIED';
+    const statusUpper = (status || '').toUpperCase();
+    if (['APPLIED', 'UNDER_REVIEW', 'SHORTLISTED', 'INTERVIEW', 'SELECTED', 'REJECTED'].includes(statusUpper)) {
+      appStatus = statusUpper;
+    }
+
+    await prisma.application.upsert({
+      where: {
+        studentId_opportunityId: {
+          studentId: student_id,
+          opportunityId: opportunity_id
+        }
+      },
+      update: {
+        status: appStatus
+      },
+      create: {
+        id: application_id,
+        studentId: student_id,
+        opportunityId: opportunity_id,
+        status: appStatus
+      }
+    });
+    applicationCount++;
+  }
+  console.log(`✓ Seeded ${applicationCount} applications.`);
+
+  // =========================================================================
+  // FINAL VERIFICATION & REPORT
+  // =========================================================================
+  console.log('\n======================================================');
+  console.log('              FINAL DATABASE RECORD COUNTS            ');
+  console.log('======================================================');
+  const counts = {
+    Skills: await prisma.skill.count(),
+    'Career Roles': await prisma.careerRole.count(),
+    'Career Skills': await prisma.careerSkill.count(),
+    'Assessment Questions': await prisma.assessmentQuestion.count(),
+    'Learning Resources': await prisma.learningResource.count(),
+    Companies: await prisma.company.count(),
+    Opportunities: await prisma.opportunity.count(),
+    Students: await prisma.student.count(),
+    Applications: await prisma.application.count()
+  };
+
+  for (const [entity, count] of Object.entries(counts)) {
+    console.log(`  ${entity.padEnd(24)} : ${count}`);
   }
 
-  // 9. Sample Application (Student 1 applied to Opportunity)
-  await prisma.application.upsert({
-    where: {
-      studentId_opportunityId: {
-        studentId: studentProfiles[0].id,
-        opportunityId: opportunity.id
-      }
-    },
-    update: {},
-    create: {
-      studentId: studentProfiles[0].id,
-      opportunityId: opportunity.id,
-      status: 'UNDER_REVIEW'
-    }
-  });
-
-  console.log('Seed data completed successfully');
+  console.log('======================================================');
+  if (orphanReports.length === 0) {
+    console.log('✓ All relations resolved successfully (0 orphan records).');
+  } else {
+    console.warn(`⚠️ Found ${orphanReports.length} orphan records:`);
+    console.warn(JSON.stringify(orphanReports, null, 2));
+  }
+  console.log('======================================================\n');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seed process failed:', e);
     process.exit(1);
   })
   .finally(async () => {

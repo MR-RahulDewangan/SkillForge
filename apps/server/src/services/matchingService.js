@@ -76,9 +76,13 @@ const calculateMatch = async (studentId, opportunityId) => {
     eligibilityScore = 0;
     eligibilityIssues.push(`Degree ${opportunity.requiredDegree} required`);
   }
-  if (opportunity.requiredBranch && student.branch !== opportunity.requiredBranch) {
-    eligibilityScore = 0;
-    eligibilityIssues.push(`Branch ${opportunity.requiredBranch} required`);
+  if (opportunity.requiredBranch && student.branch) {
+    const obReq = opportunity.requiredBranch.toLowerCase().trim();
+    const obStud = student.branch.toLowerCase().trim();
+    if (obReq !== obStud && !obStud.includes(obReq) && !obReq.includes(obStud)) {
+      eligibilityScore = 0;
+      eligibilityIssues.push(`Branch ${opportunity.requiredBranch} required`);
+    }
   }
   if (opportunity.graduationYear && student.gradYear !== opportunity.graduationYear) {
     eligibilityScore = 0;
@@ -89,7 +93,7 @@ const calculateMatch = async (studentId, opportunityId) => {
   // Match if the opportunity's required skills overlap with student's career goal skills
   let interestScore = 0;
   if (student.careerGoalId) {
-    const goalSkills = await prisma.careerRoleSkill.findMany({
+    const goalSkills = await prisma.careerSkill.findMany({
       where: { careerRoleId: student.careerGoalId }
     });
     const goalSkillIds = new Set(goalSkills.map(gs => gs.skillId));

@@ -18,6 +18,7 @@ enum OpportunityType {
   INTERNSHIP
   JOB
   APPRENTICESHIP
+  FULL_TIME
 }
 
 enum ApplicationStatus {
@@ -50,80 +51,100 @@ model User {
 }
 
 model Student {
-  id           String   @id @default(uuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id])
+  id           String              @id @default(uuid())
+  userId       String              @unique
+  user         User                @relation(fields: [userId], references: [id])
   careerGoalId String?
-  careerGoal   CareerRole? @relation(fields: [careerGoalId], references: [id])
-  skills       StudentSkill[]
-  assessments  AssessmentAttempt[]
-  applications  Application[]
-  projects     Project[]
-  certificates  Certificate[]
+  careerGoal   CareerRole?         @relation(fields: [careerGoalId], references: [id])
+  department   String?
+  semester     Int?
   degree       String?
   branch       String?
   cgpa         Float?
   gradYear     Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  skills       StudentSkill[]
+  assessments  AssessmentAttempt[]
+  applications Application[]
+  projects     Project[]
+  certificates Certificate[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 }
 
 model Company {
-  id           String   @id @default(uuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id])
-  name         String
-  industry     String
-  website      String?
-  description  String?
-  isVerified   Boolean  @default(false)
-  location     String?
-  opportunities Opportunity[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 String        @id @default(uuid())
+  userId             String        @unique
+  user               User          @relation(fields: [userId], references: [id])
+  name               String
+  industry           String
+  website            String?
+  description        String?
+  isVerified         Boolean       @default(false)
+  verificationStatus String?       @default("VERIFIED")
+  sourceId           String?
+  location           String?
+  opportunities      Opportunity[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 model Skill {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  category    String
-  careerRoles CareerRoleSkill[]
-  questions   AssessmentQuestion[]
-  studentSkills StudentSkill[]
-  courses     Course[]
-  opportunities OpportunitySkill[]
-  createdAt   DateTime @default(now())
+  id                String               @id @default(uuid())
+  name              String               @unique
+  category          String
+  subCategory       String?
+  description       String?
+  status            String?              @default("ACTIVE")
+  careerSkills      CareerSkill[]
+  questions         AssessmentQuestion[]
+  studentSkills     StudentSkill[]
+  learningResources LearningResource[]
+  opportunities     OpportunitySkill[]
+  createdAt         DateTime             @default(now())
 }
 
 model CareerRole {
-  id          String   @id @default(uuid())
-  title       String   @unique
-  description String?
-  skills      CareerRoleSkill[]
-  students    Student[]
-  createdAt   DateTime @default(now())
+  id               String        @id @default(uuid())
+  title            String        @unique
+  description      String?
+  industryCategory String?
+  status           String?       @default("ACTIVE")
+  skills           CareerSkill[]
+  students         Student[]
+  createdAt        DateTime      @default(now())
 }
 
-model CareerRoleSkill {
+model CareerSkill {
   id               String     @id @default(uuid())
   careerRoleId     String
   careerRole       CareerRole @relation(fields: [careerRoleId], references: [id])
   skillId          String
-  skill            Skill       @relation(fields: [skillId], references: [id])
+  skill            Skill      @relation(fields: [skillId], references: [id])
   minRequiredScore Int        @default(50)
+  importance       String?
+  sourceId         String?
+  verified         Boolean    @default(true)
 
   @@unique([careerRoleId, skillId])
+  @@map("CareerRoleSkill")
 }
 
 model AssessmentQuestion {
-  id            String   @id @default(uuid())
-  skillId       String
-  skill         Skill    @relation(fields: [skillId], references: [id])
-  questionText   String
-  options       String[] 
-  correctOption Int      
-  difficulty    Int      @default(1) 
-  createdAt     DateTime @default(now())
+  id              String   @id @default(uuid())
+  skillId         String
+  skill           Skill    @relation(fields: [skillId], references: [id])
+  questionText    String
+  questionType    String?  @default("MCQ")
+  options         String[]
+  correctOption   Int
+  correctAnswer   String?
+  difficulty      Int      @default(1)
+  difficultyLevel String?
+  score           Int?     @default(10)
+  explanation     String?
+  sourceId        String?
+  status          String?  @default("ACTIVE")
+  createdAt       DateTime @default(now())
 }
 
 model AssessmentAttempt {
@@ -137,72 +158,84 @@ model AssessmentAttempt {
 }
 
 model StudentSkill {
-  id        String   @id @default(uuid())
-  studentId String
-  student   Student  @relation(fields: [studentId], references: [id])
-  skillId   String
-  skill     Skill    @relation(fields: [skillId], references: [id])
-  score     Int      @default(0)
+  id         String   @id @default(uuid())
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  skillId    String
+  skill      Skill    @relation(fields: [skillId], references: [id])
+  score      Int      @default(0)
   isVerified Boolean  @default(false)
-  updatedAt DateTime @updatedAt
+  updatedAt  DateTime @updatedAt
 
   @@unique([studentId, skillId])
 }
 
-model Course {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  provider    String
-  url         String?
-  skillId     String
-  skill       Skill    @relation(fields: [skillId], references: [id])
-  duration    String?
+model LearningResource {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  provider     String
+  resourceType String?
+  skillId      String
+  skill        Skill    @relation(fields: [skillId], references: [id])
+  difficulty   String?
+  url          String?
+  duration     String?
+  isFree       Boolean  @default(true)
+  sourceId     String?
+  status       String?  @default("ACTIVE")
   createdAt    DateTime @default(now())
+
+  @@map("Course")
 }
 
 model Opportunity {
-  id               String           @id @default(uuid())
-  companyId        String
-  company          Company          @relation(fields: [companyId], references: [id])
-  type             OpportunityType
-  title            String
-  description      String
-  location         String
-  workMode         WorkMode
-  stipend          Float?
-  salary           Float?
-  minCgpa          Float?
-  requiredDegree   String?
-  requiredBranch   String?
-  graduationYear   Int?
-  deadline         DateTime
-  skills           OpportunitySkill[]
-  applications     Application[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             String             @id @default(uuid())
+  companyId      String
+  company        Company            @relation(fields: [companyId], references: [id])
+  type           OpportunityType
+  title          String
+  description    String
+  location       String
+  workMode       WorkMode
+  duration       String?
+  stipend        Float?
+  rawStipend     String?
+  salary         Float?
+  minCgpa        Float?
+  requiredDegree String?
+  requiredBranch String?
+  graduationYear Int?
+  deadline       DateTime
+  status         String?            @default("ACTIVE")
+  sourceId       String?
+  isDemo         Boolean            @default(false)
+  skills         OpportunitySkill[]
+  applications   Application[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 }
 
 model OpportunitySkill {
-  id               String     @id @default(uuid())
+  id               String      @id @default(uuid())
   opportunityId    String
   opportunity      Opportunity @relation(fields: [opportunityId], references: [id])
   skillId          String
   skill            Skill       @relation(fields: [skillId], references: [id])
-  minRequiredScore Int        @default(50)
+  minRequiredScore Int         @default(50)
 
   @@unique([opportunityId, skillId])
 }
 
 model Application {
-  id             String            @id @default(uuid())
-  studentId      String
-  student        Student           @relation(fields: [studentId], references: [id])
-  opportunityId  String
-  opportunity    Opportunity       @relation(fields: [opportunityId], references: [id])
-  status         ApplicationStatus @default(APPLIED)
-  appliedAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  id            String            @id @default(uuid())
+  studentId     String
+  student       Student           @relation(fields: [studentId], references: [id])
+  opportunityId String
+  opportunity   Opportunity       @relation(fields: [opportunityId], references: [id])
+  status        ApplicationStatus @default(APPLIED)
+  appliedAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   @@unique([studentId, opportunityId])
 }
@@ -220,14 +253,14 @@ model Project {
 }
 
 model Certificate {
-  id          String   @id @default(uuid())
-  name        String
-  issuer      String
-  issueDate   DateTime
-  url         String?
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [id])
-  isVerified  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  name       String
+  issuer     String
+  issueDate  DateTime
+  url        String?
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

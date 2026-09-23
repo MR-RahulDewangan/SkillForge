@@ -7,5 +7,6 @@ router.post('/apply', authenticate, authorize('STUDENT'), applyToOpportunity);
 router.patch('/:applicationId/status', authenticate, authorize('INDUSTRY'), updateApplicationStatus);
 router.get('/company', authenticate, authorize('INDUSTRY'), getCompanyApplications);
 router.get('/student', authenticate, authorize('STUDENT'), getStudentApplications);
+router.get('/my-applications', authenticate, authorize('STUDENT'), getStudentApplications);
 
 module.exports = router;

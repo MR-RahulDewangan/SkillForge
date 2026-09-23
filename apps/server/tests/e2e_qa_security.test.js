@@ -1,3 +1,4 @@
+require('dotenv').config();
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -272,7 +273,7 @@ async function runTestSuite() {
     const res = await axios.get(`${BASE_URL}/skills`, {
       headers: { Authorization: `Bearer ${tokens.STUDENT}` }
     });
-    testSkillId = res.data[0].id;
+    testSkillId = res.data.find(s => ['SK001', 'SK002', 'SK003', 'SK004'].includes(s.id))?.id || res.data[0].id;
     recordTest('Skill Assessment', 'Fetch Skills List (200)', res.status === 200 && res.data.length > 0);
   } catch (e) {
     recordTest('Skill Assessment', 'Fetch Skills List (200)', false, e.message);

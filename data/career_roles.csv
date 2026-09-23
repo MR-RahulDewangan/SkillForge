@@ -1,0 +1,6 @@
+career_id,career_name,description,industry_category,status
+CAREER001,Full Stack Developer,Builds and maintains end-to-end web applications,Software Development,ACTIVE
+CAREER002,Data Analyst,Transforms raw data into business intelligence and insights,Data & Analytics,ACTIVE
+CAREER003,Backend Engineer,Designs APIs data pipelines and server-side architecture,Software Development,ACTIVE
+CAREER004,Frontend Engineer,Designs and builds responsive interactive user interfaces,Software Development,ACTIVE
+CAREER005,DevOps Engineer,Automates deployment CI/CD pipelines and infrastructure,Cloud & Infrastructure,ACTIVE

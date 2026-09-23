@@ -1,0 +1,7 @@
+opportunity_id,company_id,title,opportunity_type,description,location,work_mode,duration,stipend,application_deadline,status,source_id,is_demo
+OPP001,COMP001,Full Stack Web Developer Intern,INTERNSHIP,Build full stack portal modules with React and Node.js,Bengaluru,HYBRID,6 Months,25000 INR/Month,2026-12-31,ACTIVE,SRC001,true
+OPP002,COMP002,Associate Data Analyst,INTERNSHIP,Analyze student performance metrics and build dashboards,Hyderabad,REMOTE,3 Months,20000 INR/Month,2026-12-31,ACTIVE,SRC001,true
+OPP003,COMP003,DevOps & Infrastructure Trainee,INTERNSHIP,Automate container pipelines and assist Kubernetes setup,Pune,ONSITE,6 Months,22000 INR/Month,2026-12-31,ACTIVE,SRC001,true
+OPP004,COMP001,Junior Backend Engineer,FULL_TIME,Build high-throughput REST APIs and database queries,Bengaluru,ONSITE,Permanent,600000 INR/Year,2026-12-31,ACTIVE,SRC001,true
+OPP005,COMP004,Frontend React Developer Intern,INTERNSHIP,Implement accessible UI screens and state management,Mumbai,REMOTE,3 Months,18000 INR/Month,2026-12-31,ACTIVE,SRC001,true
+OPP006,COMP002,BI Reporting Specialist,FULL_TIME,Develop institutional dashboards in Power BI and SQL,Hyderabad,HYBRID,Permanent,550000 INR/Year,2026-12-31,ACTIVE,SRC001,true

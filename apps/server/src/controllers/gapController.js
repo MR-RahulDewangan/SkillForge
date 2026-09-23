@@ -73,7 +73,7 @@ const analyzeSkillGap = async (req, res) => {
           where: { name: item.skillName }
         });
         if (skill) {
-          const courses = await prisma.course.findMany({
+          const courses = await prisma.learningResource.findMany({
             where: { skillId: skill.id }
           });
           courses.forEach(c => {
