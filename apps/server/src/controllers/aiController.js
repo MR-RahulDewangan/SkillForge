@@ -100,6 +100,15 @@ const askAssistant = async (req, res) => {
       recentAssessments: student.assessments.map(a => ({ skill: skillMap.get(a.skillId) || 'Technical Skill', score: a.score }))
     });
 
+    const useAi = req.body.useAi !== false && process.env.ENABLE_AI !== 'false';
+
+    if (!useAi) {
+      const targetRole = student.careerGoal?.title || 'Data Analyst';
+      const topSkills = student.skills.slice(0, 3).map(s => s.skill.name).join(', ');
+      const reply = `[Deterministic Guidance — AI Stopped] Based on your target goal (${targetRole}), your key competencies are ${topSkills || 'foundational skills'}. You can boost your readiness by taking recommended courses in your Skill Gap dashboard.`;
+      return res.json({ reply, source: 'rule-based-advisor' });
+    }
+
     try {
       const formData = new URLSearchParams();
       formData.append('query', query);
