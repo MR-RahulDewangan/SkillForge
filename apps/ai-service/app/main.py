@@ -20,6 +20,7 @@ app.add_middleware(
 def load_env_file():
     candidates = [
         os.path.join(os.path.dirname(__file__), "..", ".env"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "server", ".env"),
         os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"),
         ".env"
     ]
@@ -46,7 +47,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
     OPENAI_API_KEY = GEMINI_API_KEY
-    AI_MODEL = os.getenv("AI_MODEL", "gemini-1.5-flash")
+    AI_MODEL = os.getenv("AI_MODEL", "gemini-3.6-flash")
     print(f"[AI SERVICE] Initialized with Google Gemini ({AI_MODEL}) via Google AI Studio API.")
 else:
     OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
@@ -198,21 +199,22 @@ async def analyze_match(resume_text: str = Form(...), jd_text: str = Form(...)):
 async def career_assistant(query: str = Form(...), context: str = Form(...)):
     try:
         prompt = f"""
-        You are a personalized Career Assistant. Use the provided context to answer the student's query.
-        If the context contains specific skill gaps or courses, prioritize those in your answer.
-        Be encouraging, professional, and data-driven.
+        You are an expert personalized Career Assistant on an Academia-Industry collaboration portal.
+        Answer the student's question accurately, directly, and specifically based on their target career goal and profile data.
+        If they ask what skills to learn, specify the exact technical tools and core skills required for their role, compare with their verified skills, highlight their specific skill gaps, and give concrete course and next-step recommendations.
+        Format your answer clearly with Markdown headings and bullet points.
 
-        Student Context:
+        Student Profile & Career Context:
         {context}
 
-        Student Query:
+        Student Question:
         {query}
         """
         
         try:
             response = client.chat.completions.create(
                 model=AI_MODEL,
-                messages=[{"role": "system", "content": "You are a helpful AI Career Assistant. Give personalized, concise advice based on the data provided."},
+                messages=[{"role": "system", "content": "You are a helpful, data-driven AI Career Assistant. Give concrete, role-specific advice."},
                           {"role": "user", "content": prompt}]
             )
             return {"answer": response.choices[0].message.content}
@@ -223,10 +225,58 @@ async def career_assistant(query: str = Form(...), context: str = Form(...)):
                 ctx_data = json.loads(context)
             except Exception:
                 pass
-            goal = ctx_data.get("goal") or "your target career role"
-            return {
-                "answer": f"Based on your profile for {goal}, focusing on improving your assessed skill scores and completing recommended courses will directly improve your opportunity matching percentage for industry roles!"
+            goal = ctx_data.get("goal") or "Data Analyst"
+            req_skills = ctx_data.get("requiredSkills", [])
+            student_skills = ctx_data.get("studentSkills", [])
+            courses = ctx_data.get("recommendedCourses", [])
+
+            student_map = {s.get("name", "").lower(): s.get("score", 0) for s in student_skills}
+            
+            answer = f"To excel as a **{goal}**, here are the exact core skills and tools you should focus on:\n\n"
+            answer += f"### 1. Essential Skills for {goal}:\n"
+            skill_descs = {
+                "SQL": "Relational databases, complex multi-table JOINs, aggregations, window functions.",
+                "Python": "Data manipulation with Pandas, numerical computing with NumPy, automated data pipelines.",
+                "Power BI": "Interactive executive dashboards, KPI visualization, data modeling, and DAX calculations.",
+                "Statistics": "Descriptive & inferential statistics, hypothesis testing, probability, and distribution analysis.",
+                "Communication": "Data storytelling, translating quantitative metrics into actionable business recommendations."
             }
+            if req_skills:
+                for r in req_skills:
+                    rname = r.get("name", "")
+                    desc = skill_descs.get(rname, "Core industry competency required by hiring employers.")
+                    answer += f"• **{rname}**: {desc}\n"
+            else:
+                for rname, desc in skill_descs.items():
+                    answer += f"• **{rname}**: {desc}\n"
+
+            answer += f"\n### 2. Your Profile Status for {goal}:\n"
+            strengths = []
+            gaps = []
+            if req_skills:
+                for r in req_skills:
+                    rname = r.get("name", "")
+                    rscore = r.get("requiredScore", 70)
+                    cur_score = student_map.get(rname.lower(), 0)
+                    if cur_score >= rscore:
+                        strengths.append(f"{rname} ({cur_score}%)")
+                    else:
+                        gaps.append(f"{rname} (Current: {cur_score}%, Target: {rscore}%)")
+            
+            if strengths:
+                answer += f"• ✅ **Verified Strengths**: {', '.join(strengths)}\n"
+            if gaps:
+                answer += f"• ⚠️ **Priority Gaps to Learn/Improve**: {', '.join(gaps)}\n"
+            elif not req_skills:
+                answer += f"• ⚠️ **Priority Gaps to Learn**: SQL, Python, Power BI, Statistics\n"
+
+            if courses:
+                answer += f"\n### 3. Recommended Courses to Bridge Deficits:\n"
+                for c in courses:
+                    answer += f"• **{c.get('title')}** ({c.get('provider')}) — [Start Course]({c.get('url', '#')})\n"
+
+            answer += f"\n💡 **Next Step**: Take a skill assessment in the Assessment Center for your gap skills to update your verified profile and raise your opportunity match score!"
+            return {"answer": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
