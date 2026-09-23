@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+apps/*/node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Environment & Secrets (CRITICAL)
+.env
+.env.*
+apps/*/.env
+apps/*/.env.*
+*.pem
+*.key
+
+# Build outputs
+apps/web/dist/
+apps/web/build/
+dist/
+build/
+
+# Logs & Runtime
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.turbo/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
