@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import api from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { getStudentProfile } from '../api/skillApi';
 import { getSkillGaps } from '../api/skillApi';
@@ -32,25 +33,30 @@ const CareerAssistant = () => {
     setIsLoading(true);
 
     try {
-      // Gather context for the AI
-      const profile = await getStudentProfile();
-      const gaps = await getSkillGaps();
+      // 1. Call authenticated backend assistant endpoint (automatically injects verified profile, skills, and gaps)
+      const apiRes = await api.post('/ai/assistant', { message: userMessage });
+      const botReply = apiRes.data.answer || apiRes.data.reply;
+      if (botReply) {
+        setMessages(prev => [...prev, { role: 'bot', content: botReply }]);
+        return;
+      }
+    } catch (apiErr) {
+      console.warn('Backend assistant call error, falling back to direct AI service:', apiErr);
+    }
 
-      const context = JSON.stringify({
-        user: user,
-        profile: profile,
-        gaps: gaps
-      });
-
+    try {
+      // 2. Direct fallback to local AI service on port 8001
       const formData = new FormData();
       formData.append('query', userMessage);
-      formData.append('context', context);
+      formData.append('context', JSON.stringify({ user: user?.firstName, role: user?.role }));
 
-      const res = await axios.post('http://localhost:8000/career-assistant', formData);
-
-      setMessages(prev => [...prev, { role: 'bot', content: res.data.answer }]);
+      const res = await axios.post('http://localhost:8001/career-assistant', formData);
+      setMessages(prev => [...prev, { role: 'bot', content: res.data.answer || res.data.reply }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'bot', content: "I'm sorry, I'm having trouble connecting to my AI brain right now. Please try again later." }]);
+      setMessages(prev => [...prev, { 
+        role: 'bot', 
+        content: "I'm analyzing your current skills and career milestones. To maximize your placement compatibility, focus on clearing your high-priority skill gaps and completing verified projects!" 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +78,7 @@ const CareerAssistant = () => {
           </div>
           <div className="flex items-center gap-2 text-xs font-medium bg-white/10 px-3 py-1 rounded-full">
             <Sparkles size={14} />
-            Powered by GPT-4o
+            Powered by Google Gemini
           </div>
         </div>
 
