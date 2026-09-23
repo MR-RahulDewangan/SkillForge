@@ -14,6 +14,9 @@ import SkillAssessment from './pages/SkillAssessment';
 import AssessmentCenter from './pages/AssessmentCenter';
 import SkillGapDashboard from './pages/SkillGapDashboard';
 import InstitutionAnalytics from './pages/InstitutionAnalytics';
+import ResumeBuilder from './pages/ResumeBuilder';
+import RecruiterAnalytics from './pages/RecruiterAnalytics';
+import VerificationDashboard from './pages/VerificationDashboard';
 import { useAuthStore } from './store/authStore';
 
 const ProtectedRoute = ({ children }) => {
@@ -120,6 +123,30 @@ function App() {
           element={
             <ProtectedRoute>
               <InstitutionAnalytics />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/recruiter-analytics" 
+          element={
+            <ProtectedRoute>
+              <RecruiterAnalytics />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/resume-builder" 
+          element={
+            <ProtectedRoute>
+              <ResumeBuilder />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/verify" 
+          element={
+            <ProtectedRoute>
+              <VerificationDashboard />
             </ProtectedRoute>
           } 
         />

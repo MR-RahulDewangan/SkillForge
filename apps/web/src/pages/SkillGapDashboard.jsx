@@ -62,6 +62,109 @@ const SkillGapDashboard = () => {
           <div className="text-4xl font-black">{readiness}%</div>
         </div>
 
+        {/* Multi-Step Sequential Learning Roadmap */}
+        <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Career Milestone Roadmap</h2>
+              <p className="text-slate-500 text-xs mt-0.5">Sequential milestones to bridge your skill deficits and become recruitment-ready</p>
+            </div>
+            <span className="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
+              {readiness >= 100 ? 'Roadmap Completed' : readiness >= 75 ? 'Phase 3 in Progress' : readiness >= 40 ? 'Phase 2 in Progress' : 'Phase 1 Foundations'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+            {/* Phase 1 */}
+            <div className={`p-4 rounded-xl border relative ${
+              readiness >= 40 ? 'bg-emerald-50/50 border-emerald-300' : 'bg-indigo-50/50 border-indigo-300 ring-2 ring-indigo-400'
+            }`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Step 1</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  readiness >= 40 ? 'bg-emerald-100 text-emerald-800' : 'bg-indigo-100 text-indigo-800'
+                }`}>
+                  {readiness >= 40 ? 'Completed' : 'Active'}
+                </span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 mb-1">Foundational Skills</h4>
+              <p className="text-xs text-slate-600 mb-3">Core syntax, data types, and programmatic logic.</p>
+              <div className="text-[11px] font-semibold text-slate-500 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={readiness >= 40 ? "text-emerald-600" : "text-indigo-600"}>✓</span>
+                  <span>Basic Assessments</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase 2 */}
+            <div className={`p-4 rounded-xl border relative ${
+              readiness >= 75 ? 'bg-emerald-50/50 border-emerald-300' : readiness >= 40 ? 'bg-indigo-50/50 border-indigo-300 ring-2 ring-indigo-400' : 'bg-slate-50 border-slate-200 opacity-70'
+            }`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Step 2</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  readiness >= 75 ? 'bg-emerald-100 text-emerald-800' : readiness >= 40 ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {readiness >= 75 ? 'Completed' : readiness >= 40 ? 'Active' : 'Locked'}
+                </span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 mb-1">Core Competency</h4>
+              <p className="text-xs text-slate-600 mb-3">Industry-standard tools, database querying & APIs.</p>
+              <div className="text-[11px] font-semibold text-slate-500 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={readiness >= 75 ? "text-emerald-600" : "text-slate-400"}>•</span>
+                  <span>Role-Specific Gaps</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase 3 */}
+            <div className={`p-4 rounded-xl border relative ${
+              readiness >= 90 ? 'bg-emerald-50/50 border-emerald-300' : readiness >= 75 ? 'bg-indigo-50/50 border-indigo-300 ring-2 ring-indigo-400' : 'bg-slate-50 border-slate-200 opacity-70'
+            }`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Step 3</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  readiness >= 90 ? 'bg-emerald-100 text-emerald-800' : readiness >= 75 ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {readiness >= 90 ? 'Completed' : readiness >= 75 ? 'Active' : 'Locked'}
+                </span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 mb-1">Applied Projects</h4>
+              <p className="text-xs text-slate-600 mb-3">Production implementations and verified capstones.</p>
+              <div className="text-[11px] font-semibold text-slate-500 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={readiness >= 90 ? "text-emerald-600" : "text-slate-400"}>•</span>
+                  <span>Portfolio Verification</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase 4 */}
+            <div className={`p-4 rounded-xl border relative ${
+              readiness >= 100 ? 'bg-emerald-50/50 border-emerald-300' : readiness >= 90 ? 'bg-indigo-50/50 border-indigo-300 ring-2 ring-indigo-400' : 'bg-slate-50 border-slate-200 opacity-70'
+            }`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Step 4</span>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  readiness >= 100 ? 'bg-emerald-100 text-emerald-800' : readiness >= 90 ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {readiness >= 100 ? 'Completed' : readiness >= 90 ? 'Active' : 'Locked'}
+                </span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 mb-1">Recruitment Ready</h4>
+              <p className="text-xs text-slate-600 mb-3">Targeted job applications with 90%+ match scores.</p>
+              <div className="text-[11px] font-semibold text-slate-500 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={readiness >= 100 ? "text-emerald-600" : "text-slate-400"}>•</span>
+                  <span>ATS Shortlisting</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {gaps.length === 0 ? (
           <div className="bg-white p-12 rounded-2xl border text-center space-y-4">
             <div className="mx-auto w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">

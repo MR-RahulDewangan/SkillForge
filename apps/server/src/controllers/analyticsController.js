@@ -130,4 +130,138 @@ const getPlacementFunnel = async (req, res) => {
   }
 };
 
-module.exports = { getInstitutionOverview, getIndustryDemand, getStudentGaps, getPlacementFunnel };
+const getRecruiterAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const company = await prisma.company.findFirst({
+      where: { userId }
+    });
+
+    if (!company) {
+      return res.status(404).json({ message: 'Company profile not found' });
+    }
+
+    const opportunities = await prisma.opportunity.findMany({
+      where: { companyId: company.id },
+      include: {
+        skills: { include: { skill: true } },
+        applications: {
+          include: {
+            student: {
+              include: {
+                user: { select: { firstName: true, lastName: true, email: true } },
+                skills: { include: { skill: true } }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const totalPostings = opportunities.length;
+    const internshipCount = opportunities.filter(o => o.type === 'INTERNSHIP').length;
+    const jobCount = opportunities.filter(o => o.type === 'JOB').length;
+    const apprenticeshipCount = opportunities.filter(o => o.type === 'APPRENTICESHIP').length;
+
+    let totalApplicants = 0;
+    const funnel = {
+      APPLIED: 0,
+      UNDER_REVIEW: 0,
+      SHORTLISTED: 0,
+      INTERVIEW: 0,
+      SELECTED: 0,
+      REJECTED: 0
+    };
+
+    let totalMatchSum = 0;
+    let scoredApplicantCount = 0;
+    const postingsOverview = [];
+    const skillDemandCount = {};
+
+    for (const opp of opportunities) {
+      const oppApps = opp.applications;
+      totalApplicants += oppApps.length;
+
+      opp.skills.forEach(os => {
+        skillDemandCount[os.skill.name] = (skillDemandCount[os.skill.name] || 0) + 1;
+      });
+
+      let oppMatchSum = 0;
+      let oppShortlisted = 0;
+
+      for (const app of oppApps) {
+        if (funnel[app.status] !== undefined) {
+          funnel[app.status]++;
+        }
+        if (app.status === 'SHORTLISTED' || app.status === 'SELECTED' || app.status === 'INTERVIEW') {
+          oppShortlisted++;
+        }
+
+        const reqSkills = opp.skills;
+        if (reqSkills.length > 0) {
+          const studentSkillMap = new Map(app.student.skills.map(ss => [ss.skillId, ss.score]));
+          let matchScore = 0;
+          reqSkills.forEach(rs => {
+            const studentScore = studentSkillMap.get(rs.skillId) || 0;
+            if (studentScore >= rs.minRequiredScore) {
+              matchScore += 1;
+            } else if (studentScore > 0) {
+              matchScore += (studentScore / rs.minRequiredScore);
+            }
+          });
+          const pct = Math.round((matchScore / reqSkills.length) * 100);
+          totalMatchSum += pct;
+          scoredApplicantCount++;
+          oppMatchSum += pct;
+        }
+      }
+
+      postingsOverview.push({
+        id: opp.id,
+        title: opp.title,
+        type: opp.type,
+        applicantCount: oppApps.length,
+        shortlistedCount: oppShortlisted,
+        avgMatchScore: oppApps.length > 0 ? Math.round(oppMatchSum / oppApps.length) : 0,
+        deadline: opp.deadline
+      });
+    }
+
+    const avgApplicantMatch = scoredApplicantCount > 0 ? Math.round(totalMatchSum / scoredApplicantCount) : 0;
+    const topRequiredSkills = Object.entries(skillDemandCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    res.json({
+      company: {
+        id: company.id,
+        name: company.name,
+        isVerified: company.isVerified
+      },
+      metrics: {
+        totalPostings,
+        internshipCount,
+        jobCount,
+        apprenticeshipCount,
+        totalApplicants,
+        shortlistedCount: funnel.SHORTLISTED + funnel.INTERVIEW + funnel.SELECTED,
+        selectedCount: funnel.SELECTED,
+        avgApplicantMatch
+      },
+      funnel: Object.entries(funnel).map(([status, count]) => ({ status, count })),
+      postingsOverview,
+      topRequiredSkills
+    });
+  } catch (error) {
+    console.error('Recruiter analytics error:', error);
+    res.status(500).json({ message: 'Recruiter analytics error', error: error.message });
+  }
+};
+
+module.exports = { 
+  getInstitutionOverview, 
+  getIndustryDemand, 
+  getStudentGaps, 
+  getPlacementFunnel,
+  getRecruiterAnalytics 
+};

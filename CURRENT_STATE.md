@@ -28,6 +28,18 @@ The database is managed via Prisma and includes models for:
 ## 🔌 API Integration
 - **Backend $\rightarrow$ AI**: The server interacts with the AI service for unstructured data extraction (Resumes/JDs).
 - **Frontend $\rightarrow$ Backend**: REST API utilizing Bearer tokens for authentication (via Axios request interceptor).
+- **Resume & Recruiter Endpoints**:
+  - `GET /api/student/resume`: Complete verified dossier (education, verified skills, projects, certificates) for ATS resume rendering.
+  - `GET /api/analytics/recruiter`: Company-specific recruitment analytics (hiring funnel, applicant match quality, in-demand skill coverage).
+
+## 🚀 DevOps & Containerization
+- **Containerization**:
+  - `apps/server/Dockerfile`: Node 20-Alpine with Prisma generate.
+  - `apps/ai-service/Dockerfile`: Python 3.11-slim with FastAPI and PyMuPDF.
+  - `apps/web/Dockerfile`: Multi-stage build with Nginx for SPA routing (`nginx.conf`).
+  - `docker-compose.yml`: Root orchestrator for PostgreSQL 16, Backend API, Web Frontend, and AI Service.
+- **CI/CD Pipeline**:
+  - `.github/workflows/ci.yml`: Multi-stage GitHub Actions workflow validating backend modules, frontend Vite production build, and AI service syntax.
 
 ## 🚦 Environment Configuration
 - Uses `.env` files for `DATABASE_URL`, `JWT_SECRET`, `PORT`, and `AI_SERVICE_URL`.

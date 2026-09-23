@@ -21,6 +21,7 @@ const Dashboard = () => {
         { name: 'Job & Internship Search', path: '/opportunities', desc: 'Browse matched internships and jobs' },
         { name: 'Skill Profile & Portfolio', path: '/profile', desc: 'Manage skills and digital portfolio' },
         { name: 'My Applications', path: '/my-applications', desc: 'Track your application statuses' },
+        { name: 'ATS Resume Builder', path: '/resume-builder', desc: 'Generate & export verified ATS resume' },
         { name: 'AI Career Assistant', path: '/ai-assistant', desc: 'Get personalized career guidance' },
         { name: 'AI Resume Import', path: '/resume-parser', desc: 'Autofill profile from resume PDF' }
       ]
@@ -33,7 +34,7 @@ const Dashboard = () => {
       features: [
         { name: 'Company Dashboard', path: '/company/dashboard', desc: 'Manage organization and post opportunities' },
         { name: 'Applicant Tracking (ATS)', path: '/ats', desc: 'Review candidates and match scores' },
-        { name: 'Institution Analytics', path: '/analytics', desc: 'View skill demand and pipeline data' }
+        { name: 'Recruiter Analytics', path: '/recruiter-analytics', desc: 'Hiring funnel and candidate quality' }
       ]
     },
     FACULTY: {
@@ -53,6 +54,7 @@ const Dashboard = () => {
       welcome: 'Monitor institutional growth',
       features: [
         { name: 'Institution Analytics', path: '/analytics', desc: 'KPIs, skill gaps, demand, placement funnel' },
+        { name: 'Verification Queue', path: '/verify', desc: 'Review & verify student credentials' },
         { name: 'Browse Opportunities', path: '/opportunities', desc: 'Active company postings' }
       ]
     },
@@ -78,6 +80,7 @@ const Dashboard = () => {
               <Link to="/gap-analysis" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Skill Gap</Link>
               <Link to="/opportunities" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Opportunities</Link>
               <Link to="/my-applications" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Applications</Link>
+              <Link to="/resume-builder" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">ATS Resume</Link>
               <Link to="/ai-assistant" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">AI Assistant</Link>
             </>
           )}
@@ -85,9 +88,16 @@ const Dashboard = () => {
             <>
               <Link to="/company/dashboard" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Company</Link>
               <Link to="/ats" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">ATS Applicants</Link>
+              <Link to="/recruiter-analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
             </>
           )}
-          {(user.role === 'INSTITUTION_ADMIN' || user.role === 'FACULTY') && (
+          {user.role === 'INSTITUTION_ADMIN' && (
+            <>
+              <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
+              <Link to="/verify" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Verification Queue</Link>
+            </>
+          )}
+          {user.role === 'FACULTY' && (
             <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
           )}
         </nav>

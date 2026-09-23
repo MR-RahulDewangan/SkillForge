@@ -69,7 +69,10 @@ async function main() {
   ];
 
   for (const c of courses) {
-    await prisma.course.create({ data: c });
+    const existingCourse = await prisma.course.findFirst({ where: { title: c.title } });
+    if (!existingCourse) {
+      await prisma.course.create({ data: c });
+    }
   }
 
   const profiles = studentProfiles;
@@ -82,7 +85,8 @@ async function main() {
       { studentId: profiles[0].id, skillId: skillIds[2], score: 80 },
       { studentId: profiles[0].id, skillId: skillIds[3], score: 78 },
       { studentId: profiles[0].id, skillId: skillIds[4], score: 70 },
-    ]
+    ],
+    skipDuplicates: true
   });
 
   await prisma.studentSkill.createMany({
@@ -92,7 +96,8 @@ async function main() {
       { studentId: profiles[1].id, skillId: skillIds[2], score: 90 },
       { studentId: profiles[1].id, skillId: skillIds[3], score: 50 },
       { studentId: profiles[1].id, skillId: skillIds[4], score: 80 },
-    ]
+    ],
+    skipDuplicates: true
   });
 
   await prisma.studentSkill.createMany({
@@ -102,8 +107,41 @@ async function main() {
       { studentId: profiles[2].id, skillId: skillIds[2], score: 20 },
       { studentId: profiles[2].id, skillId: skillIds[3], score: 10 },
       { studentId: profiles[2].id, skillId: skillIds[4], score: 50 },
-    ]
+    ],
+    skipDuplicates: true
   });
+
+  // Seed sample verified project and certificate for Alice
+  const existingProj = await prisma.project.findFirst({
+    where: { studentId: profiles[0].id, name: 'E-Commerce Analytics Engine' }
+  });
+  if (!existingProj) {
+    await prisma.project.create({
+      data: {
+        studentId: profiles[0].id,
+        name: 'E-Commerce Analytics Engine',
+        description: 'Engineered an end-to-end data pipeline using Python, PostgreSQL, and Power BI analyzing 500K+ transaction records to forecast cohort retention and customer lifetime value.',
+        url: 'https://github.com/alice-one/ecommerce-analytics',
+        isVerified: true
+      }
+    });
+  }
+
+  const existingCert = await prisma.certificate.findFirst({
+    where: { studentId: profiles[0].id, name: 'Microsoft Certified: Power BI Data Analyst Associate' }
+  });
+  if (!existingCert) {
+    await prisma.certificate.create({
+      data: {
+        studentId: profiles[0].id,
+        name: 'Microsoft Certified: Power BI Data Analyst Associate',
+        issuer: 'Microsoft',
+        issueDate: new Date('2025-11-15'),
+        url: 'https://learn.microsoft.com/credentials',
+        isVerified: true
+      }
+    });
+  }
 
   for (const p of profiles) {
     await prisma.student.update({ 

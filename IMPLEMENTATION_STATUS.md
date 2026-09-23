@@ -17,7 +17,9 @@ This document tracks the progress of the Academia–Industry Collaboration Porta
 | Job Search | [COMPLETE] | Filter by type, mode, and location. |
 | Opportunity Matching | [COMPLETE] | Deterministic formula (70/20/10) with explainable breakdown. |
 | Applications | [COMPLETE] | One-click apply and status tracking flow implemented. |
-| Resume Generation | [MISSING] | No automated resume builder yet. |
+| Resume Generation | [COMPLETE] | Automated ATS Resume Builder with PDF export & inline customization (`ResumeBuilder.jsx`, `GET /api/student/resume`). |
+| Gamification & Badges | [COMPLETE] | Dynamic Milestone Badges based on verified assessments, projects, and certifications (`SkillProfile.jsx`). |
+| Learning Roadmaps | [COMPLETE] | Sequential 4-phase milestone roadmap bridging skill deficits (`SkillGapDashboard.jsx`). |
 | Career Assistant | [COMPLETE] | UI integrated in Student Dashboard with local Ollama fallback. |
 
 ## 🏢 Industry Features
@@ -27,13 +29,13 @@ This document tracks the progress of the Academia–Industry Collaboration Porta
 | Opportunity Posting | [COMPLETE] | PostOpportunityModal + Zod validation + backend endpoints. |
 | Applicant Mgmt | [COMPLETE] | Recruiter ATS view with status changer. |
 | Candidate Matching | [COMPLETE] | 70/20/10 compatibility calculation per applicant. |
-| Recruitment Analytics | [PARTIAL] | Accessible via Institution overview. |
+| Recruitment Analytics | [COMPLETE] | Dedicated Recruiter Analytics dashboard with hiring funnel, applicant compatibility quality, and posting performance (`RecruiterAnalytics.jsx`, `GET /api/analytics/recruiter`). |
 
 ## 🏫 Faculty/Institution Features
 | Feature | Status | Notes |
 | :--- | :--- | :--- |
-| Faculty Profile | [MISSING] | No specific faculty profile management. |
-| Verification | [COMPLETE] | Portfolio and Skill verification implemented. |
+| Faculty Profile & Portal | [SKIPPED] | Explicitly skipped per user instruction. |
+| Verification | [COMPLETE] | Portfolio and Skill verification queue implemented (`VerificationDashboard.jsx`). |
 | Student Analytics | [COMPLETE] | Institution-wide KPI dashboards. |
 | Industry Demand Analytics | [COMPLETE] | Tracked across posted opportunities. |
 | Placement Analytics | [COMPLETE] | Placement funnel breakdown. |
@@ -44,6 +46,8 @@ This document tracks the progress of the Academia–Industry Collaboration Porta
 | RBAC | [COMPLETE] | `authenticate` and `authorize` middleware implemented. |
 | AI Integrations | [COMPLETE] | Local Ollama + fallback parsing and guidance. |
 | Matching Engine | [COMPLETE] | Deterministic formula (70/20/10) implemented. |
-| Seed Data | [COMPLETE] | Full roles, skills, questions, company, and opportunity seeded. |
+| Seed Data | [COMPLETE] | Full roles, skills, questions, company, opportunity, project, and certificate seeded. |
 | Input Validation | [COMPLETE] | Zod schemas implemented for Auth, Opportunity, and Portfolio. |
 | Error Handling | [COMPLETE] | Centralized Express error handler middleware. |
+| Dockerization | [COMPLETE] | Production Dockerfiles for server, web, ai-service + root `docker-compose.yml`. |
+| CI/CD Automation | [COMPLETE] | GitHub Actions workflow `.github/workflows/ci.yml` for multi-stage validation. |

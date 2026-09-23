@@ -42,6 +42,62 @@ const SkillProfile = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading Profile...</div>;
   if (!profile) return <div className="min-h-screen flex items-center justify-center">Profile not found.</div>;
 
+  // Dynamic Milestone Badges
+  const hasAttempt = (profile.assessments || []).length > 0;
+  const hasHighSkill = (profile.skills || []).some(s => s.score >= 80);
+  const isPolymath = (profile.skills || []).length >= 3;
+  const hasProject = (profile.projects || []).length > 0;
+  const hasCertificate = (profile.certificates || []).length > 0;
+  const avgScore = (profile.skills || []).length > 0 
+    ? Math.round(profile.skills.reduce((acc, c) => acc + c.score, 0) / profile.skills.length)
+    : 0;
+  const isPlacementReady = avgScore >= 70;
+
+  const badges = [
+    {
+      id: 'pioneer',
+      name: 'Skill Pioneer',
+      desc: 'Completed first assessment',
+      icon: '🌟',
+      unlocked: hasAttempt
+    },
+    {
+      id: 'specialist',
+      name: 'Domain Specialist',
+      desc: 'Scored 80%+ on any skill',
+      icon: '🏆',
+      unlocked: hasHighSkill
+    },
+    {
+      id: 'polymath',
+      name: 'Tech Polymath',
+      desc: 'Assessed across 3+ skills',
+      icon: '💡',
+      unlocked: isPolymath
+    },
+    {
+      id: 'builder',
+      name: 'Portfolio Builder',
+      desc: 'Added projects to portfolio',
+      icon: '🚀',
+      unlocked: hasProject
+    },
+    {
+      id: 'certified',
+      name: 'Certified Achiever',
+      desc: 'Added accredited certificate',
+      icon: '📜',
+      unlocked: hasCertificate
+    },
+    {
+      id: 'ready',
+      name: 'Industry Ready',
+      desc: 'Average skill score >= 70%',
+      icon: '🎯',
+      unlocked: isPlacementReady
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -50,17 +106,26 @@ const SkillProfile = () => {
             <h1 className="text-3xl font-bold text-slate-900">Skill Profile</h1>
             <p className="text-slate-500">Track your progress and bridge the gap</p>
           </div>
-          <div className="flex items-center gap-3 bg-white p-3 rounded-xl border shadow-sm">
-            <Target className="text-indigo-600" size={20} />
-            <span className="text-sm font-medium text-slate-600">Career Goal:</span>
-            <select 
-              value={profile.careerGoalId || ''} 
-              onChange={(e) => handleGoalChange(e.target.value)}
-              className="text-sm font-bold text-indigo-600 bg-transparent outline-none"
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => navigate('/resume-builder')}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 shadow-sm transition"
             >
-              <option value="">Select Goal</option>
-              {roles.map(r => <option key={r.id} value={r.id}>{r.title}</option>)}
-            </select>
+              <Award size={18} />
+              Generate ATS Resume
+            </button>
+            <div className="flex items-center gap-3 bg-white p-2.5 rounded-xl border shadow-sm">
+              <Target className="text-indigo-600" size={18} />
+              <span className="text-sm font-medium text-slate-600">Career Goal:</span>
+              <select 
+                value={profile.careerGoalId || ''} 
+                onChange={(e) => handleGoalChange(e.target.value)}
+                className="text-sm font-bold text-indigo-600 bg-transparent outline-none cursor-pointer"
+              >
+                <option value="">Select Goal</option>
+                {roles.map(r => <option key={r.id} value={r.id}>{r.title}</option>)}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -103,6 +168,40 @@ const SkillProfile = () => {
           </div>
 
           <div className="space-y-6">
+            {/* Milestone Badges */}
+            <div className="bg-white p-6 rounded-2xl border shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Award size={20} className="text-amber-500" />
+                  Milestone Badges
+                </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                  {badges.filter(b => b.unlocked).length} / {badges.length} Earned
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {badges.map(b => (
+                  <div 
+                    key={b.id} 
+                    className={`p-3 rounded-xl border transition flex flex-col items-center text-center ${
+                      b.unlocked 
+                        ? 'bg-amber-50/50 border-amber-200 text-slate-800 shadow-sm' 
+                        : 'bg-slate-50/60 border-slate-100 text-slate-400 grayscale opacity-60'
+                    }`}
+                  >
+                    <span className="text-2xl mb-1">{b.icon}</span>
+                    <span className="text-xs font-bold leading-tight">{b.name}</span>
+                    <span className="text-[10px] mt-1 line-clamp-1">{b.desc}</span>
+                    <span className={`text-[9px] font-bold mt-2 px-1.5 py-0.5 rounded ${
+                      b.unlocked ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {b.unlocked ? 'Earned' : 'Locked'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="bg-white p-6 rounded-2xl border shadow-sm">
               <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <History size={20} className="text-indigo-600" />

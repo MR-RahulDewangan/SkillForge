@@ -29,9 +29,9 @@ This document lists the remaining work required to bring the Academia–Industry
 - [x] **Departmental Breakdown**: Analytics filtered by academic branch.
 
 ### 5. Student Experience
-- [ ] **Resume Generator**: Implement a "Download PDF Resume" feature based on verified skills.
-- [ ] **Gamification**: Add badges for skill milestones (e.g., "SQL Expert").
-- [ ] **Learning Roadmaps**: Transition from single course recs to a step-by-step path.
+- [x] **Resume Generator**: Implement a "Download PDF Resume" feature based on verified skills (`ResumeBuilder.jsx`, `GET /api/student/resume`).
+- [x] **Gamification**: Add badges for skill milestones (e.g., "SQL Expert", "Skill Pioneer", "Domain Specialist", "Industry Ready" in `SkillProfile.jsx`).
+- [x] **Learning Roadmaps**: Transition from single course recs to a sequential 4-phase milestone path (`SkillGapDashboard.jsx`).
 
 ---
 
@@ -45,5 +45,5 @@ This document lists the remaining work required to bring the Academia–Industry
 
 ### 7. Deployment
 - [x] **Production Build**: Configured Vite for production (compiled successfully).
-- [ ] **Dockerization**: Create `Dockerfile` for server and AI service.
-- [ ] **CI/CD**: Basic GitHub Actions for testing.
+- [x] **Dockerization**: Created `Dockerfile` for `apps/server`, `apps/web`, `apps/ai-service`, and root `docker-compose.yml`.
+- [x] **CI/CD**: Created GitHub Actions workflow `.github/workflows/ci.yml` validating backend, frontend, and AI service.

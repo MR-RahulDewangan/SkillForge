@@ -34,3 +34,8 @@ export const getSkillGaps = async () => {
   const response = await api.get('/gap/analysis');
   return response.data;
 };
+
+export const getResumeData = async () => {
+  const response = await api.get('/student/resume');
+  return response.data;
+};
