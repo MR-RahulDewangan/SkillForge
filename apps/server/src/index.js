@@ -43,12 +43,24 @@ app.use('/api/verify', verificationRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-app.use(errorHandler);
+// Root landing info
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'SkillForge Backend API (SIH 2026)',
+    version: '1.0.0',
+    message: 'Backend server is operational. Connect the web frontend using this URL.',
+    healthCheck: '/health',
+    repository: 'https://github.com/MR-RahulDewangan/SkillForge'
+  });
+});
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
