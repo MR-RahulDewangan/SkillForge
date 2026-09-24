@@ -156,7 +156,39 @@ node test_complete_flow.js
 
 # 3. Run full automated QA and security test suite (75 tests)
 node tests/e2e_qa_security.test.js
+
+# 4. Verify all 12 demo accounts authentication (100% pass)
+node tests/test_all_logins.js
 ```
+
+---
+
+## ☁️ Free Cloud Deployment Guide
+
+The platform is pre-configured for free cloud deployment:
+
+### 1. Database (PostgreSQL 16) — [Neon.tech](https://neon.tech)
+* Create a free PostgreSQL instance on Neon.
+* Copy the connection string: `postgresql://<user>:<password>@<host>/neondb?sslmode=require`
+
+### 2. Backend API (Node.js Express) — [Render.com](https://render.com)
+* Create a new **Web Service** linked to this GitHub repo.
+* **Root Directory**: `apps/server`
+* **Build Command**: `npm install && npm run build`
+* **Start Command**: `npm run prod` *(runs Prisma migrations, seeds CSV datasets, and starts Express)*
+* **Environment Variables**:
+  * `DATABASE_URL`: *Your Neon connection string*
+  * `JWT_SECRET`: *Any secure random string*
+  * `PORT`: `5000`
+
+### 3. Frontend Web App (React Vite SPA) — [Vercel](https://vercel.com)
+* Import this GitHub repo on Vercel.
+* **Root Directory**: `apps/web`
+* **Framework Preset**: `Vite`
+* **Build Command**: `npm run build`
+* **Output Directory**: `dist`
+* **Environment Variables**:
+  * `VITE_API_URL`: `https://your-render-backend-url.onrender.com`
 
 ---
 
@@ -166,4 +198,6 @@ node tests/e2e_qa_security.test.js
 * **IDOR Prevention**: Resource ownership verified on all portfolio, application, match, and notification endpoints.
 * **Upload Hardening**: 5MB limit, sanitized alphanumeric filenames, and strict MIME validation on PDF/image uploads.
 * **Password Hashing**: Bcrypt with 10 salt rounds.
+* **Email Normalization**: Automatic whitespace trimming and lowercasing across authentication and user lookup.
 * **Sensitive Data Protection**: Assessment solutions and password hashes are never leaked in client responses.
+
