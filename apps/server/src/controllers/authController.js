@@ -20,7 +20,8 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Invalid role specified' });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await prisma.user.findUnique({ where: { email: cleanEmail } });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
     }
@@ -28,7 +29,7 @@ const register = async (req, res) => {
     const hashedPassword = await hashPassword(password);
     const user = await prisma.user.create({
       data: {
-        email,
+        email: cleanEmail,
         password: hashedPassword,
         firstName,
         lastName,
@@ -64,7 +65,12 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
