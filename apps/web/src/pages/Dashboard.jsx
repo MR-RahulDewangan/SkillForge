@@ -131,15 +131,6 @@ const Dashboard = () => {
                 {user.firstName[0]}{user.lastName[0]}
               </div>
             </div>
-            <div className="h-5 w-px bg-slate-200" />
-            <button 
-              onClick={logout}
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-red-200 hover:bg-red-50 transition"
-              title="Logout from SkillForge"
-            >
-              <LogOut size={14} />
-              <span>Logout</span>
-            </button>
           </div>
         </header>
 
