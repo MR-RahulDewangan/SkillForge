@@ -9,7 +9,7 @@ const CareerAssistant = () => {
   const [messages, setMessages] = useState([
     { 
       role: 'bot', 
-      content: "Hello! I'm your AI Career Assistant powered by Google Gemini. I have access to your verified skill profile and career goals. How can I help you today?" 
+      content: "Hello! I'm your SkillForge Career Assistant. I have access to your verified skill profile and career goals. How can I help you today?" 
     }
   ]);
   const [input, setInput] = useState('');
@@ -175,13 +175,13 @@ const CareerAssistant = () => {
               <Bot size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold">AI Career Assistant</h1>
+              <h1 className="text-xl font-bold">Career Assistant</h1>
               <p className="text-indigo-100 text-xs">Personalized Guidance & Skill Analysis</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs font-semibold bg-white/10 px-3.5 py-1.5 rounded-full border border-white/20">
+          <div className="flex items-center gap-2 text-xs font-semibold bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
             <Sparkles size={14} className="text-amber-300" />
-            <span>Google Gemini</span>
+            <span>Advisory Engine</span>
           </div>
         </div>
 
@@ -234,7 +234,7 @@ const CareerAssistant = () => {
               <button
                 type="button"
                 onClick={handleStopAnswer}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold shadow-sm transition"
               >
                 <Square size={12} className="fill-white" />
                 <span>Stop generating answer</span>

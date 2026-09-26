@@ -123,7 +123,7 @@ const InstitutionAnalytics = () => {
           <StatCard title="Total Students" value={overview?.totalStudents || 0} icon={Users} color="bg-blue-500" />
           <StatCard title="Assessed" value={overview?.assessedStudents || 0} icon={TrendingUp} color="bg-indigo-500" />
           <StatCard title="Ready Students" value={overview?.readyCount || 0} icon={Award} color="bg-green-500" />
-          <StatCard title="Avg Skill Score" value={`${overview?.avgScore || 0}%`} icon={BarChart3} color="bg-purple-500" />
+          <StatCard title="Avg Skill Score" value={`${overview?.avgScore || 0}%`} icon={BarChart3} color="bg-sky-600" />
           <StatCard title="Total Applications" value={overview?.totalApplications || 0} icon={Briefcase} color="bg-amber-500" />
           <StatCard title="Shortlisted" value={overview?.shortlistedCount || 0} icon={CheckCircle} color="bg-cyan-500" />
           <StatCard title="Selected" value={overview?.selectedCount || 0} icon={Award} color="bg-emerald-500" />

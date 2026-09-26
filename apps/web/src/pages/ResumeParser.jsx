@@ -62,8 +62,8 @@ const ResumeParser = () => {
             <div className="mx-auto w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-4">
               <Upload size={32} />
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">AI Resume Import</h1>
-            <p className="text-slate-500">Upload your resume in PDF format and let our AI automatically populate your professional profile.</p>
+            <h1 className="text-3xl font-bold text-slate-900">Resume Import & Parser</h1>
+            <p className="text-slate-500">Upload your resume in PDF format to automatically extract competencies and populate your profile.</p>
           </div>
 
           <div className="relative group">
@@ -96,7 +96,7 @@ const ResumeParser = () => {
           <button
             onClick={handleUpload}
             disabled={!file || uploading}
-            className="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-indigo-600 text-white p-3.5 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {uploading ? (
               <>
@@ -104,12 +104,12 @@ const ResumeParser = () => {
                 {status === 'parsing' ? 'Parsing Resume...' : 'Updating Profile...'}
               </>
             ) : (
-              'Magic Import'
+              'Import Resume'
             )}
           </button>
 
           {status === 'success' && (
-            <div className="p-4 bg-green-50 text-green-600 rounded-xl flex items-center justify-center gap-3 text-sm border border-green-100 animate-bounce">
+            <div className="p-4 bg-green-50 text-green-600 rounded-xl flex items-center justify-center gap-3 text-sm border border-green-100">
               <CheckCircle2 size={20} />
               Profile successfully updated from resume!
             </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../api/authApi';
 import { UserPlus } from 'lucide-react';
 
@@ -26,14 +26,15 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 py-12 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
         <div className="flex justify-center mb-6">
-          <div className="p-3 bg-green-100 rounded-full text-green-600">
+          <div className="p-3 bg-emerald-100 rounded-xl text-emerald-600">
             <UserPlus size={32} />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-center mb-8 text-slate-800">Create Account</h2>
+        <h2 className="text-2xl font-bold text-center mb-2 text-slate-800">SkillForge Registration</h2>
+        <p className="text-center text-sm text-slate-500 mb-6">Academia-Industry Collaboration Platform</p>
         {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -91,13 +92,18 @@ const Register = () => {
               <option value="INSTITUTION_ADMIN">Institution Admin</option>
             </select>
           </div>
-          <button className="w-full bg-green-600 text-white p-2 rounded font-semibold hover:bg-green-700 transition">
+          <button className="w-full bg-emerald-600 text-white p-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition">
             Sign Up
           </button>
         </form>
         <p className="text-center mt-6 text-sm text-slate-600">
-          Already have an account? <a href="/login" className="text-green-600 font-semibold">Login</a>
+          Already have an account? <Link to="/login" className="text-emerald-600 font-semibold hover:underline">Login</Link>
         </p>
+        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-500">
+          <Link to="/privacy" className="hover:text-slate-700 transition">Privacy Policy</Link>
+          <span>•</span>
+          <Link to="/terms" className="hover:text-slate-700 transition">Terms & Conditions</Link>
+        </div>
       </div>
     </div>
   );

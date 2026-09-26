@@ -63,8 +63,8 @@ const CompanyDashboard = () => {
             <h1 className="text-3xl font-bold text-slate-900">Company Dashboard</h1>
             <p className="text-slate-500">Manage your organization and industry presence</p>
           </div>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${
-            profile.isVerified ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold ${
+            profile.isVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
           }`}>
             {profile.isVerified && <CheckCircle size={14} />}
             {profile.isVerified ? 'Verified Partner' : 'Pending Verification'}

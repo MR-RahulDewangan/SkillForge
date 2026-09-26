@@ -152,7 +152,7 @@ const ApplicantTrackingSystem = () => {
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${getStatusColor(app.status)}`}>
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${getStatusColor(app.status)}`}>
                               {app.status}
                             </span>
                           </td>

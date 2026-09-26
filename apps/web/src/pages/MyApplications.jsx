@@ -70,7 +70,7 @@ const MyApplications = () => {
                 </div>
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
-                  <div className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusStyles(app.status)}`}>
+                  <div className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${getStatusStyles(app.status)}`}>
                     {app.status.replace('_', ' ')}
                   </div>
                   {app.status === 'SELECTED' && <CheckCircle2 className="text-green-500" size={20} />}

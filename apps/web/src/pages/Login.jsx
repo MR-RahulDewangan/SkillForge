@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn } from 'lucide-react';
@@ -41,12 +41,12 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 py-12 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
         <div className="flex justify-center mb-6">
-          <div className="p-3 bg-indigo-100 rounded-full text-indigo-600">
+          <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
             <LogIn size={32} />
           </div>
         </div>
         <h2 className="text-2xl font-bold text-center mb-2 text-slate-800">SkillForge Login</h2>
-        <p className="text-center text-sm text-slate-500 mb-6">Academia–Industry Collaboration Portal</p>
+        <p className="text-center text-sm text-slate-500 mb-6">Academia-Industry Collaboration Platform</p>
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4 text-sm font-medium">
@@ -128,8 +128,14 @@ const Login = () => {
         </div>
 
         <p className="text-center mt-6 text-sm text-slate-600">
-          Don't have an account? <a href="/register" className="text-indigo-600 font-semibold hover:underline">Register</a>
+          Don't have an account? <Link to="/register" className="text-indigo-600 font-semibold hover:underline">Register</Link>
         </p>
+
+        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-500">
+          <Link to="/privacy" className="hover:text-slate-700 transition">Privacy Policy</Link>
+          <span>•</span>
+          <Link to="/terms" className="hover:text-slate-700 transition">Terms & Conditions</Link>
+        </div>
       </div>
     </div>
   );

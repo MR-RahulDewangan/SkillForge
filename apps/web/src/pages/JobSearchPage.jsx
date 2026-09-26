@@ -136,7 +136,7 @@ const JobSearchPage = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     {opp.match && (
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
                         opp.match.overallMatch >= 70 ? 'bg-green-100 text-green-700 border border-green-200' :
                         opp.match.overallMatch >= 40 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
                         'bg-red-100 text-red-700 border border-red-200'
@@ -144,7 +144,7 @@ const JobSearchPage = () => {
                         {opp.match.overallMatch}% Match
                       </span>
                     )}
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-600">
+                    <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
                       {opp.type}
                     </span>
                   </div>

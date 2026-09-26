@@ -175,7 +175,7 @@ const SkillProfile = () => {
                   <Award size={20} className="text-amber-500" />
                   Milestone Badges
                 </h2>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
                   {badges.filter(b => b.unlocked).length} / {badges.length} Earned
                 </span>
               </div>

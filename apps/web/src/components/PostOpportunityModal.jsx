@@ -82,7 +82,7 @@ const PostOpportunityModal = ({ isOpen, onClose, onOpportunityCreated }) => {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <div className="p-6 border-b flex justify-between items-center bg-slate-50">
           <h2 className="text-2xl font-bold text-slate-800">Post New Opportunity</h2>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition">
+          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-lg transition">
             <X size={24} className="text-slate-500" />
           </button>
         </div>
@@ -217,7 +217,7 @@ const PostOpportunityModal = ({ isOpen, onClose, onOpportunityCreated }) => {
                   key={skill.id}
                   type="button"
                   onClick={() => handleSkillToggle(skill)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition ${
                     formData.selectedSkills.find(s => s.id === skill.id)
                       ? 'bg-indigo-600 text-white'
                       : 'bg-white text-slate-600 border hover:border-indigo-400'

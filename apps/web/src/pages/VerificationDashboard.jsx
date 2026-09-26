@@ -83,17 +83,17 @@ const VerificationDashboard = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => handleVerify(item.id, item.type, false)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-full transition"
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition"
                   title="Reject"
                 >
-                  <XCircle size={24} />
+                  <XCircle size={22} />
                 </button>
                 <button
                   onClick={() => handleVerify(item.id, item.type, true)}
-                  className="p-2 text-green-600 hover:bg-green-50 rounded-full transition"
+                  className="p-2 text-green-600 hover:bg-green-50 rounded-lg border border-transparent hover:border-green-200 transition"
                   title="Verify"
                 >
-                  <CheckCircle size={24} />
+                  <CheckCircle size={22} />
                 </button>
               </div>
             </div>

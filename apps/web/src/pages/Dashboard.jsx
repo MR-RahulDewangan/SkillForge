@@ -14,7 +14,7 @@ const Dashboard = () => {
       title: 'Student Portal',
       icon: <GraduationCap className="text-blue-600" />,
       color: 'bg-blue-50',
-      welcome: 'Ready to boost your skills?',
+      welcome: 'Student Competency & Opportunity Workspace',
       features: [
         { name: 'Skill Assessment', path: '/assess', desc: 'Test and certify your technical skills' },
         { name: 'Skill Gap Analysis', path: '/gap-analysis', desc: 'Analyze gaps against career target' },
@@ -30,7 +30,7 @@ const Dashboard = () => {
       title: 'Recruiter Portal',
       icon: <Briefcase className="text-indigo-600" />,
       color: 'bg-indigo-50',
-      welcome: 'Looking for top talent?',
+      welcome: 'Recruiter ATS & Talent Acquisition Workspace',
       features: [
         { name: 'Company Dashboard', path: '/company/dashboard', desc: 'Manage organization and post opportunities' },
         { name: 'Applicant Tracking (ATS)', path: '/ats', desc: 'Review candidates and match scores' },
@@ -39,9 +39,9 @@ const Dashboard = () => {
     },
     FACULTY: {
       title: 'Academician Portal',
-      icon: <User className="text-green-600" />,
-      color: 'bg-green-50',
-      welcome: 'Collaborate with industry experts',
+      icon: <User className="text-emerald-600" />,
+      color: 'bg-emerald-50',
+      welcome: 'Academic Verification & Faculty Portal',
       features: [
         { name: 'Institution Analytics', path: '/analytics', desc: 'Skill gaps and industry demands' },
         { name: 'Browse Opportunities', path: '/opportunities', desc: 'View student internships and jobs' }
@@ -49,9 +49,9 @@ const Dashboard = () => {
     },
     INSTITUTION_ADMIN: {
       title: 'Admin Control Panel',
-      icon: <ShieldCheck className="text-purple-600" />,
-      color: 'bg-purple-50',
-      welcome: 'Monitor institutional growth',
+      icon: <ShieldCheck className="text-indigo-600" />,
+      color: 'bg-indigo-50',
+      welcome: 'Institutional Analytics & Placement Control Panel',
       features: [
         { name: 'Institution Analytics', path: '/analytics', desc: 'KPIs, skill gaps, demand, placement funnel' },
         { name: 'Verification Queue', path: '/verify', desc: 'Review & verify student credentials' },
@@ -67,10 +67,12 @@ const Dashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-white flex flex-col">
         <div className="p-6 flex items-center gap-3 font-bold text-xl border-b border-slate-800">
-          <LayoutDashboard size={24} />
-          <span>SIH Portal</span>
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+            SF
+          </div>
+          <span>SkillForge</span>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <div className="text-xs uppercase text-slate-500 font-semibold px-2 mb-4">Main Menu</div>
           <Link to="/dashboard" className="flex items-center gap-3 p-2 rounded bg-slate-800 text-white">Dashboard</Link>
           <Link to="/profile" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Profile</Link>
@@ -101,12 +103,17 @@ const Dashboard = () => {
             <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
           )}
         </nav>
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-slate-800 space-y-3">
+          <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
+            <Link to="/privacy" className="hover:text-slate-300 transition">Privacy Policy</Link>
+            <span>•</span>
+            <Link to="/terms" className="hover:text-slate-300 transition">Terms</Link>
+          </div>
           <button 
             onClick={logout}
-            className="flex items-center gap-3 w-full p-2 rounded text-red-400 hover:bg-red-900/20 transition"
+            className="flex items-center gap-3 w-full p-2 rounded text-red-400 hover:bg-red-900/20 transition text-sm"
           >
-            <LogOut size={20} />
+            <LogOut size={18} />
             <span>Logout</span>
           </button>
         </div>
@@ -118,7 +125,7 @@ const Dashboard = () => {
           <h1 className="text-xl font-semibold text-slate-800">{config.title}</h1>
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-600">{user.firstName} {user.lastName}</span>
-            <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-xs font-bold text-slate-600">
+            <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-600">
               {user.firstName[0]}{user.lastName[0]}
             </div>
           </div>

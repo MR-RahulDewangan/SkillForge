@@ -17,6 +17,8 @@ import InstitutionAnalytics from './pages/InstitutionAnalytics';
 import ResumeBuilder from './pages/ResumeBuilder';
 import RecruiterAnalytics from './pages/RecruiterAnalytics';
 import VerificationDashboard from './pages/VerificationDashboard';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
 import { useAuthStore } from './store/authStore';
 
 const ProtectedRoute = ({ children }) => {
@@ -150,6 +152,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>

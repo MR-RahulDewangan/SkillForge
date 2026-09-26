@@ -78,7 +78,7 @@ const AssessmentCenter = () => {
                   <div key={skill.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-300 transition group">
                     <div>
                       <span className="font-semibold text-slate-700">{skill.name}</span>
-                      <span className="ml-3 text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded-full">{skill.category}</span>
+                      <span className="ml-3 text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md font-medium">{skill.category}</span>
                     </div>
                     <button 
                       onClick={() => navigate(`/assess/${skill.id}`)}

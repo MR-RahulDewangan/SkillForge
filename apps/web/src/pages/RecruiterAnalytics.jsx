@@ -68,7 +68,7 @@ const RecruiterAnalytics = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'SELECTED': return 'bg-emerald-500';
-      case 'INTERVIEW': return 'bg-purple-500';
+      case 'INTERVIEW': return 'bg-blue-500';
       case 'SHORTLISTED': return 'bg-indigo-500';
       case 'UNDER_REVIEW': return 'bg-amber-500';
       case 'REJECTED': return 'bg-rose-400';

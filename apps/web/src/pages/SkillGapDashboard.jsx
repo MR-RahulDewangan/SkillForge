@@ -69,7 +69,7 @@ const SkillGapDashboard = () => {
               <h2 className="text-xl font-bold text-slate-900">Career Milestone Roadmap</h2>
               <p className="text-slate-500 text-xs mt-0.5">Sequential milestones to bridge your skill deficits and become recruitment-ready</p>
             </div>
-            <span className="text-xs font-bold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
+            <span className="text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200">
               {readiness >= 100 ? 'Roadmap Completed' : readiness >= 75 ? 'Phase 3 in Progress' : readiness >= 40 ? 'Phase 2 in Progress' : 'Phase 1 Foundations'}
             </span>
           </div>
@@ -190,10 +190,10 @@ const SkillGapDashboard = () => {
                     </div>
                     <h3 className="text-xl font-bold text-slate-800">{gap.skillName}</h3>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    gap.status === 'Critical' ? 'bg-red-100 text-red-600' : 
-                    gap.status === 'Moderate' ? 'bg-yellow-100 text-yellow-600' : 
-                    'bg-green-100 text-green-600'
+                  <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                    gap.status === 'Critical' ? 'bg-red-100 text-red-700 border border-red-200' : 
+                    gap.status === 'Moderate' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                    'bg-green-100 text-green-700 border border-green-200'
                   }`}>
                     {gap.status} Gap
                   </span>
