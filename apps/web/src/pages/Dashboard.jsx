@@ -64,70 +64,82 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col">
-        <div className="p-6 flex items-center gap-3 font-bold text-xl border-b border-slate-800">
+      {/* Sidebar - Pinned Viewport Height with Fixed Logout Button */}
+      <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen sticky top-0 shrink-0 z-20">
+        <div className="p-6 flex items-center gap-3 font-bold text-xl border-b border-slate-800 shrink-0">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
             SF
           </div>
           <span>SkillForge</span>
         </div>
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <div className="text-xs uppercase text-slate-500 font-semibold px-2 mb-4">Main Menu</div>
-          <Link to="/dashboard" className="flex items-center gap-3 p-2 rounded bg-slate-800 text-white">Dashboard</Link>
-          <Link to="/profile" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Profile</Link>
+        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto min-h-0">
+          <div className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold px-2 mb-2">Main Menu</div>
+          <Link to="/dashboard" className="flex items-center gap-3 p-2 rounded-lg bg-slate-800 text-white text-sm font-medium">Dashboard</Link>
+          <Link to="/profile" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Profile</Link>
           {user.role === 'STUDENT' && (
             <>
-              <Link to="/assess" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Assessment</Link>
-              <Link to="/gap-analysis" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Skill Gap</Link>
-              <Link to="/opportunities" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Opportunities</Link>
-              <Link to="/my-applications" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Applications</Link>
-              <Link to="/resume-builder" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">ATS Resume</Link>
-              <Link to="/ai-assistant" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">AI Assistant</Link>
+              <Link to="/assess" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Assessment</Link>
+              <Link to="/gap-analysis" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Skill Gap</Link>
+              <Link to="/opportunities" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Opportunities</Link>
+              <Link to="/my-applications" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Applications</Link>
+              <Link to="/resume-builder" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">ATS Resume</Link>
+              <Link to="/ai-assistant" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">AI Assistant</Link>
             </>
           )}
           {user.role === 'INDUSTRY' && (
             <>
-              <Link to="/company/dashboard" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Company</Link>
-              <Link to="/ats" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">ATS Applicants</Link>
-              <Link to="/recruiter-analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
+              <Link to="/company/dashboard" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Company</Link>
+              <Link to="/ats" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">ATS Applicants</Link>
+              <Link to="/recruiter-analytics" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Analytics</Link>
             </>
           )}
           {user.role === 'INSTITUTION_ADMIN' && (
             <>
-              <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
-              <Link to="/verify" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Verification Queue</Link>
+              <Link to="/analytics" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Analytics</Link>
+              <Link to="/verify" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Verification Queue</Link>
             </>
           )}
           {user.role === 'FACULTY' && (
-            <Link to="/analytics" className="flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition">Analytics</Link>
+            <Link to="/analytics" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition text-sm">Analytics</Link>
           )}
         </nav>
-        <div className="p-4 border-t border-slate-800 space-y-3">
-          <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
+        {/* Pinned Bottom Bar with Logout Button - Always visible without scrolling */}
+        <div className="p-4 border-t border-slate-800 shrink-0 bg-slate-900 space-y-2.5">
+          <button 
+            onClick={logout}
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900/50 hover:text-red-300 border border-red-900/40 transition text-sm font-medium shadow-sm"
+          >
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
+          <div className="flex items-center justify-between text-[11px] text-slate-500 px-1 pt-1">
             <Link to="/privacy" className="hover:text-slate-300 transition">Privacy Policy</Link>
             <span>•</span>
             <Link to="/terms" className="hover:text-slate-300 transition">Terms</Link>
           </div>
-          <button 
-            onClick={logout}
-            className="flex items-center gap-3 w-full p-2 rounded text-red-400 hover:bg-red-900/20 transition text-sm"
-          >
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        <header className="h-16 bg-white border-b px-8 flex items-center justify-between">
+      <main className="flex-1 flex flex-col min-w-0">
+        <header className="h-16 bg-white border-b px-8 flex items-center justify-between sticky top-0 z-10">
           <h1 className="text-xl font-semibold text-slate-800">{config.title}</h1>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-600">{user.firstName} {user.lastName}</span>
-            <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-600">
-              {user.firstName[0]}{user.lastName[0]}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-600 font-medium">{user.firstName} {user.lastName}</span>
+              <div className="w-8 h-8 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-700">
+                {user.firstName[0]}{user.lastName[0]}
+              </div>
             </div>
+            <div className="h-5 w-px bg-slate-200" />
+            <button 
+              onClick={logout}
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-red-200 hover:bg-red-50 transition"
+              title="Logout from SkillForge"
+            >
+              <LogOut size={14} />
+              <span>Logout</span>
+            </button>
           </div>
         </header>
 
